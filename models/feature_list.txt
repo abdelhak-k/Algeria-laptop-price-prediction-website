@@ -1,0 +1,161 @@
+============================================================
+COMPLETE FEATURE LIST FOR PRICE PREDICTION MODEL
+============================================================
+
+NUMERIC FEATURES:
+  - RAM_SIZE_GB
+  - SSD_SIZE_GB
+
+BINARY FEATURES:
+  - is_pro
+
+CATEGORICAL FEATURES (One-Hot Encoded):
+  - series_AERO
+  - series_ALIENWARE
+  - series_ASPIRE
+  - series_BLADE
+  - series_ELITEBOOK
+  - series_ENVY
+  - series_IDEAPAD
+  - series_INSPIRON
+  - series_KATANA
+  - series_LATITUDE
+  - series_LEGION
+  - series_MACBOOK
+  - series_NITRO
+  - series_OMEN
+  - series_PAVILION
+  - series_PRECISION
+  - series_PREDATOR
+  - series_PROBOOK
+  - series_ROG
+  - series_SPECTRE
+  - series_SPIN
+  - series_SWIFT
+  - series_SWORD
+  - series_THINKBOOK
+  - series_THINKPAD
+  - series_TRAVELMATE
+  - series_TUF
+  - series_UNKNOWN
+  - series_VICTUS
+  - series_VIVOBOOK
+  - series_VOSTRO
+  - series_XPS
+  - series_YOGA
+  - series_ZBOOK
+  - series_ZENBOOK
+  - cpu_family_SNAPDRAGON
+  - cpu_family_UNKNOWN
+  - cpu_family_celeron
+  - cpu_family_i3
+  - cpu_family_i5
+  - cpu_family_i7
+  - cpu_family_i9
+  - cpu_family_m1
+  - cpu_family_m2
+  - cpu_family_m3
+  - cpu_family_m4
+  - cpu_family_pentium
+  - cpu_family_r3
+  - cpu_family_r5
+  - cpu_family_r7
+  - cpu_family_r9
+  - cpu_family_ultra5
+  - cpu_family_ultra7
+  - cpu_family_ultra9
+  - cpu_family_xeon
+  - gpu_tier_ARC
+  - gpu_tier_GTX
+  - gpu_tier_GTX 1050
+  - gpu_tier_GTX 1060
+  - gpu_tier_GTX 1070
+  - gpu_tier_GTX 1080
+  - gpu_tier_GTX 1650
+  - gpu_tier_GTX 1660
+  - gpu_tier_MX
+  - gpu_tier_NONE
+  - gpu_tier_OTHER
+  - gpu_tier_Quadro Legacy
+  - gpu_tier_Quadro M-Series
+  - gpu_tier_Quadro P-Series
+  - gpu_tier_Quadro T-Series
+  - gpu_tier_RTX 2050
+  - gpu_tier_RTX 2060
+  - gpu_tier_RTX 2070
+  - gpu_tier_RTX 2080
+  - gpu_tier_RTX 3050
+  - gpu_tier_RTX 3060
+  - gpu_tier_RTX 3070
+  - gpu_tier_RTX 3080
+  - gpu_tier_RTX 4050
+  - gpu_tier_RTX 4060
+  - gpu_tier_RTX 4070
+  - gpu_tier_RTX 4080
+  - gpu_tier_RTX 4090
+  - gpu_tier_RTX 5060
+  - gpu_tier_RTX 5070
+  - gpu_tier_RTX 5080
+  - gpu_tier_RTX 5090
+  - gpu_tier_RTX Workstation 2000
+  - gpu_tier_RTX Workstation 3000
+  - gpu_tier_RTX Workstation 4000
+  - gpu_tier_RTX Workstation 5000
+  - gpu_tier_RX 6
+  - gpu_tier_RX 7
+  - condition_BON ÉTAT
+  - condition_JAMAIS UTILISÉ
+  - condition_MOYEN
+  - condition_UNKNOWN
+  - gpu_suffix_MAX-Q
+  - gpu_suffix_SUPER
+  - gpu_suffix_TI
+  - gpu_suffix_nan
+  - cpu_suffix_G
+  - cpu_suffix_H
+  - cpu_suffix_HQ
+  - cpu_suffix_HS
+  - cpu_suffix_HX
+  - cpu_suffix_MAX
+  - cpu_suffix_P
+  - cpu_suffix_PRO
+  - cpu_suffix_U
+  - cpu_suffix_nan
+  - cpu_gen_brand_AMD_0
+  - cpu_gen_brand_AMD_1
+  - cpu_gen_brand_AMD_2
+  - cpu_gen_brand_AMD_3
+  - cpu_gen_brand_AMD_4
+  - cpu_gen_brand_AMD_5
+  - cpu_gen_brand_AMD_6
+  - cpu_gen_brand_AMD_7
+  - cpu_gen_brand_AMD_8
+  - cpu_gen_brand_AMD_9
+  - cpu_gen_brand_APPLE_0
+  - cpu_gen_brand_INTEL_0
+  - cpu_gen_brand_INTEL_1
+  - cpu_gen_brand_INTEL_10
+  - cpu_gen_brand_INTEL_11
+  - cpu_gen_brand_INTEL_12
+  - cpu_gen_brand_INTEL_13
+  - cpu_gen_brand_INTEL_14
+  - cpu_gen_brand_INTEL_2
+  - cpu_gen_brand_INTEL_3
+  - cpu_gen_brand_INTEL_4
+  - cpu_gen_brand_INTEL_5
+  - cpu_gen_brand_INTEL_6
+  - cpu_gen_brand_INTEL_7
+  - cpu_gen_brand_INTEL_8
+  - cpu_gen_brand_INTEL_9
+  - cpu_gen_brand_QUALCOMM_0
+  - cpu_gen_brand_UNKNOWN_0
+  - listing_year_2018
+  - listing_year_2019
+  - listing_year_2020
+  - listing_year_2021
+  - listing_year_2022
+  - listing_year_2023
+  - listing_year_2024
+  - listing_year_2025
+
+TOTAL: 150 features

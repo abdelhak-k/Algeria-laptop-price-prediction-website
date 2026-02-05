@@ -1,0 +1,410 @@
+{% extends 'predictor/base.html' %}
+
+{% block title %}Predict Laptop Price - Algerian Market{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header text-center">
+                <h2><i class="fas fa-laptop me-2"></i></h2>
+                <p class="mb-0 mt-2 opacity-75">Enter your laptop specifications to get an estimated price in DZD</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" action="{% url 'predictor:home' %}">
+                    {% csrf_token %}
+                    
+                    <!-- Basic Information -->
+                    <div class="form-section">
+                        <div class="section-icon">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <h5 class="mb-0">Basic Information</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Brand</label>
+                                {{ form.brand }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Series</label>
+                                {{ form.series }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Condition</label>
+                                {{ form.condition }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Listing Year</label>
+                                {{ form.listing_year }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- CPU Specifications -->
+                    <div class="form-section">
+                        <div class="section-icon">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <h5 class="mb-0">CPU Specifications</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">CPU Brand</label>
+                                {{ form.cpu_brand }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">CPU Family</label>
+                                {{ form.cpu_family }}
+                            </div>
+                            <div class="col-md-3 mb-3" id="generation-container">
+                                <label class="form-label">Generation</label>
+                                {{ form.cpu_generation }}
+                                <small class="text-muted" id="generation-help"></small>
+                            </div>
+                            <div class="col-md-3 mb-3" id="suffix-container">
+                                <label class="form-label">CPU Suffix</label>
+                                {{ form.cpu_suffix }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    {{ form.is_pro }}
+                                    <label class="form-check-label">Professional/Business CPU</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- GPU Specifications -->
+                    <div class="form-section">
+                        <div class="section-icon">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-tv"></i>
+                            </div>
+                            <h5 class="mb-0">GPU Specifications</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">GPU Model</label>
+                                {{ form.gpu_tier }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">GPU Suffix</label>
+                                {{ form.gpu_suffix }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Memory & Storage -->
+                    <div class="form-section">
+                        <div class="section-icon">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-memory"></i>
+                            </div>
+                            <h5 class="mb-0">Memory & Storage</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">RAM Size (GB)</label>
+                                {{ form.ram_size_gb }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">SSD Size (GB)</label>
+                                {{ form.ssd_size_gb }}
+                                <small class="text-muted">Enter 0 if no SSD</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">HDD Size (GB)</label>
+                                {{ form.hdd_size_gb }}
+                                <small class="text-muted">Enter 0 if no HDD</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-predict">
+                            <i class="fas fa-calculator me-2"></i>Predict Price
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Brand to Series mapping
+    const brandSeriesMap = {
+        'LENOVO': ['IDEAPAD', 'THINKPAD', 'LEGION', 'YOGA', 'UNKNOWN'],
+        'HP': ['PAVILION', 'OMEN', 'ELITEBOOK', 'PROBOOK', 'SPECTRE', 'ENVY', 'VICTUS', 'UNKNOWN'],
+        'DELL': ['INSPIRON', 'LATITUDE', 'XPS', 'ALIENWARE', 'VOSTRO', 'PRECISION', 'G SERIES', 'UNKNOWN'],
+        'ASUS': ['VIVOBOOK', 'ZENBOOK', 'ROG', 'TUF', 'EXPERTBOOK', 'UNKNOWN'],
+        'ACER': ['ASPIRE', 'NITRO', 'PREDATOR', 'SWIFT', 'SPIN', 'UNKNOWN'],
+        'APPLE': ['MACBOOK AIR', 'MACBOOK PRO'],
+        'MSI': ['STEALTH', 'KATANA', 'RAIDER', 'PRESTIGE', 'MODERN', 'UNKNOWN'],
+        'GIGABYTE': ['AERO', 'AORUS', 'G5', 'UNKNOWN'],
+        'HUAWEI': ['MATEBOOK', 'UNKNOWN'],
+        'SAMSUNG': ['GALAXY BOOK', 'UNKNOWN'],
+        'TOSHIBA': ['SATELLITE', 'TECRA', 'UNKNOWN'],
+        'OTHER': ['UNKNOWN']
+    };
+
+    // Series display names
+    const seriesDisplayNames = {
+        'IDEAPAD': 'IdeaPad',
+        'THINKPAD': 'ThinkPad',
+        'LEGION': 'Legion',
+        'YOGA': 'Yoga',
+        'PAVILION': 'Pavilion',
+        'OMEN': 'Omen',
+        'VICTUS': 'Victus',
+        'ELITEBOOK': 'EliteBook',
+        'PROBOOK': 'ProBook',
+        'SPECTRE': 'Spectre',
+        'ENVY': 'Envy',
+        'INSPIRON': 'Inspiron',
+        'LATITUDE': 'Latitude',
+        'XPS': 'XPS',
+        'ALIENWARE': 'Alienware',
+        'VOSTRO': 'Vostro',
+        'PRECISION': 'Precision',
+        'G SERIES': 'G Series',
+        'VIVOBOOK': 'VivoBook',
+        'ZENBOOK': 'ZenBook',
+        'ROG': 'ROG',
+        'TUF': 'TUF',
+        'EXPERTBOOK': 'ExpertBook',
+        'ASPIRE': 'Aspire',
+        'NITRO': 'Nitro',
+        'PREDATOR': 'Predator',
+        'SWIFT': 'Swift',
+        'SPIN': 'Spin',
+        'MACBOOK AIR': 'MacBook Air',
+        'MACBOOK PRO': 'MacBook Pro',
+        'AERO': 'Aero',
+        'AORUS': 'Aorus',
+        'G5': 'G5',
+        'STEALTH': 'Stealth',
+        'KATANA': 'Katana',
+        'RAIDER': 'Raider',
+        'PRESTIGE': 'Prestige',
+        'MODERN': 'Modern',
+        'MATEBOOK': 'MateBook',
+        'GALAXY BOOK': 'Galaxy Book',
+        'SATELLITE': 'Satellite',
+        'TECRA': 'Tecra',
+        'UNKNOWN': 'Unknown/Other'
+    };
+
+    // CPU Brand to Family mapping
+    const cpuBrandFamilyMap = {
+        'INTEL': [
+            {value: 'i3', label: 'Intel Core i3'},
+            {value: 'i5', label: 'Intel Core i5'},
+            {value: 'i7', label: 'Intel Core i7'},
+            {value: 'i9', label: 'Intel Core i9'},
+            {value: 'ultra5', label: 'Intel Core Ultra 5'},
+            {value: 'ultra7', label: 'Intel Core Ultra 7'},
+            {value: 'ultra9', label: 'Intel Core Ultra 9'},
+            {value: 'celeron', label: 'Intel Celeron'},
+            {value: 'pentium', label: 'Intel Pentium'},
+            {value: 'xeon', label: 'Intel Xeon'}
+        ],
+        'AMD': [
+            {value: 'r3', label: 'AMD Ryzen 3'},
+            {value: 'r5', label: 'AMD Ryzen 5'},
+            {value: 'r7', label: 'AMD Ryzen 7'},
+            {value: 'r9', label: 'AMD Ryzen 9'}
+        ],
+        'APPLE': [
+            {value: 'm1', label: 'Apple M1'},
+            {value: 'm2', label: 'Apple M2'},
+            {value: 'm3', label: 'Apple M3'},
+            {value: 'm4', label: 'Apple M4'}
+        ],
+        'QUALCOMM': [
+            {value: 'SNAPDRAGON', label: 'Qualcomm Snapdragon'}
+        ],
+        'UNKNOWN': [
+            {value: 'UNKNOWN', label: 'Unknown'}
+        ]
+    };
+
+    // Apple Silicon chips and Qualcomm (no generation needed)
+    const noGenerationChips = ['m1', 'm2', 'm3', 'm4', 'SNAPDRAGON', 'UNKNOWN'];
+
+    // CPU Suffix mapping by CPU brand
+    const cpuSuffixMap = {
+        'INTEL': [
+            {value: '', label: 'None/Standard'},
+            {value: 'U', label: 'U (Ultra-low power)'},
+            {value: 'H', label: 'H (High performance)'},
+            {value: 'HQ', label: 'HQ (High performance Quad)'},
+            {value: 'HS', label: 'HS (High performance Slim)'},
+            {value: 'HX', label: 'HX (Extreme performance)'},
+            {value: 'G', label: 'G (With integrated graphics)'},
+            {value: 'P', label: 'P (Performance)'}
+        ],
+        'AMD': [
+            {value: '', label: 'None/Standard'},
+            {value: 'U', label: 'U (Ultra-low power)'},
+            {value: 'H', label: 'H (High performance)'},
+            {value: 'HS', label: 'HS (High performance Slim)'},
+            {value: 'HX', label: 'HX (Extreme performance)'}
+        ],
+        'APPLE': [
+            {value: '', label: 'None/Standard'},
+            {value: 'PRO', label: 'Pro'},
+            {value: 'MAX', label: 'Max'}
+        ],
+        'QUALCOMM': [
+            {value: '', label: 'None/Standard'}
+        ],
+        'UNKNOWN': [
+            {value: '', label: 'None/Standard'}
+        ]
+    };
+
+    // Update series dropdown based on brand
+    function updateSeriesDropdown() {
+        const brandSelect = document.getElementById('id_brand');
+        const seriesSelect = document.getElementById('id_series');
+        const selectedBrand = brandSelect.value;
+        
+        // Store current selection
+        const currentSeries = seriesSelect.value;
+        
+        // Clear options
+        seriesSelect.innerHTML = '<option value="">Select Series</option>';
+        
+        if (selectedBrand && brandSeriesMap[selectedBrand]) {
+            brandSeriesMap[selectedBrand].forEach(series => {
+                const option = document.createElement('option');
+                option.value = series;
+                option.textContent = seriesDisplayNames[series] || series;
+                seriesSelect.appendChild(option);
+            });
+            
+            // Restore selection if still valid
+            if (brandSeriesMap[selectedBrand].includes(currentSeries)) {
+                seriesSelect.value = currentSeries;
+            }
+        }
+        
+        // If Apple is selected, also update CPU brand
+        if (selectedBrand === 'APPLE') {
+            document.getElementById('id_cpu_brand').value = 'APPLE';
+            updateCpuFamilyDropdown();
+        }
+    }
+
+    // Update CPU Family dropdown based on CPU Brand
+    function updateCpuFamilyDropdown() {
+        const cpuBrandSelect = document.getElementById('id_cpu_brand');
+        const cpuFamilySelect = document.getElementById('id_cpu_family');
+        const selectedCpuBrand = cpuBrandSelect.value;
+        
+        // Store current selection
+        const currentFamily = cpuFamilySelect.value;
+        
+        // Clear options
+        cpuFamilySelect.innerHTML = '<option value="">Select CPU Family</option>';
+        
+        if (selectedCpuBrand && cpuBrandFamilyMap[selectedCpuBrand]) {
+            cpuBrandFamilyMap[selectedCpuBrand].forEach(cpu => {
+                const option = document.createElement('option');
+                option.value = cpu.value;
+                option.textContent = cpu.label;
+                cpuFamilySelect.appendChild(option);
+            });
+            
+            // Check if current selection is still valid
+            const validValues = cpuBrandFamilyMap[selectedCpuBrand].map(c => c.value);
+            if (validValues.includes(currentFamily)) {
+                cpuFamilySelect.value = currentFamily;
+            }
+        }
+        
+        updateGenerationVisibility();
+        updateCpuSuffixDropdown();
+    }
+
+    // Update CPU suffix dropdown based on CPU brand
+    function updateCpuSuffixDropdown() {
+        const cpuBrandSelect = document.getElementById('id_cpu_brand');
+        const cpuSuffixSelect = document.getElementById('id_cpu_suffix');
+        const selectedCpuBrand = cpuBrandSelect.value;
+        
+        // Store current selection
+        const currentSuffix = cpuSuffixSelect.value;
+        
+        // Clear options
+        cpuSuffixSelect.innerHTML = '';
+        
+        const suffixes = cpuSuffixMap[selectedCpuBrand] || cpuSuffixMap['INTEL'];
+        suffixes.forEach(suffix => {
+            const option = document.createElement('option');
+            option.value = suffix.value;
+            option.textContent = suffix.label;
+            cpuSuffixSelect.appendChild(option);
+        });
+        
+        // Check if current selection is still valid
+        const validValues = suffixes.map(s => s.value);
+        if (validValues.includes(currentSuffix)) {
+            cpuSuffixSelect.value = currentSuffix;
+        }
+    }
+
+    // Update generation field visibility based on CPU family
+    function updateGenerationVisibility() {
+        const cpuFamilySelect = document.getElementById('id_cpu_family');
+        const generationSelect = document.getElementById('id_cpu_generation');
+        const generationContainer = document.getElementById('generation-container');
+        const generationHelp = document.getElementById('generation-help');
+        const selectedFamily = cpuFamilySelect.value;
+        
+        if (noGenerationChips.includes(selectedFamily)) {
+            // Apple Silicon / Snapdragon / Unknown - set generation to 0
+            generationSelect.value = '0';
+            generationSelect.disabled = true;
+            generationHelp.textContent = 'N/A for this CPU type';
+        } else {
+            generationSelect.disabled = false;
+            generationHelp.textContent = '';
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const brandSelect = document.getElementById('id_brand');
+        const cpuBrandSelect = document.getElementById('id_cpu_brand');
+        const cpuFamilySelect = document.getElementById('id_cpu_family');
+        
+        // Add event listeners
+        brandSelect.addEventListener('change', updateSeriesDropdown);
+        cpuBrandSelect.addEventListener('change', updateCpuFamilyDropdown);
+        cpuFamilySelect.addEventListener('change', updateGenerationVisibility);
+        
+        // Initialize dropdowns if values are already set
+        if (brandSelect.value) {
+            updateSeriesDropdown();
+        }
+        if (cpuBrandSelect.value) {
+            updateCpuFamilyDropdown();
+            updateCpuSuffixDropdown();
+        }
+        if (cpuFamilySelect.value) {
+            updateGenerationVisibility();
+        }
+    });
+</script>
+{% endblock %}

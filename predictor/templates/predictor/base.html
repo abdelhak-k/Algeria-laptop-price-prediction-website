@@ -1,0 +1,386 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Algerian Laptop Price Predictor{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Algerian Flag Colors */
+            --algeria-green: #006233;
+            --algeria-green-light: #00843d;
+            --algeria-red: #d21034;
+            --algeria-white: #ffffff;
+            
+            /* Design Colors */
+            --primary-color: #006233;
+            --secondary-color: #00843d;
+            --accent-color: #d21034;
+            --text-dark: #1a1a2e;
+            --text-light: #6c757d;
+            --bg-light: #f8f9fa;
+        }
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--algeria-green) 0%, #004d26 50%, var(--algeria-green) 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Decorative pattern overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .main-container {
+            position: relative;
+            z-index: 1;
+            padding: 2rem 0;
+        }
+        
+        /* Header with Algerian branding */
+        .navbar-brand-custom {
+            display: flex;
+            align-items: center;
+            color: white !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-decoration: none;
+        }
+        
+        .navbar-brand-custom img {
+            height: 50px;
+            margin-right: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .header-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .header-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 0.5rem;
+        }
+        
+        .header-section .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Algerian Flag exponent decoration */
+        .algeria-star {
+            color: var(--algeria-red);
+            font-size: 0.8rem;
+            margin: 0 2px;
+            vertical-align: super;
+            position: relative;
+            top: -0.3em;
+        }
+        
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            background: white;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--algeria-green) 0%, var(--algeria-green-light) 100%);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 1.5rem 2rem;
+            border-bottom: 4px solid var(--algeria-red);
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-header h2 i {
+            margin-right: 10px;
+        }
+        
+        /* Form sections */
+        .form-section {
+            background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--algeria-green);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .form-section h5 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(0, 98, 51, 0.2);
+            font-weight: 600;
+        }
+        
+        .section-icon {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .icon-wrapper {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--algeria-green), var(--algeria-green-light));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 12px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0, 98, 51, 0.3);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--algeria-green);
+            box-shadow: 0 0 0 3px rgba(0, 98, 51, 0.15);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--algeria-green);
+            border-color: var(--algeria-green);
+        }
+        
+        /* Buttons */
+        .btn-predict {
+            background: linear-gradient(135deg, var(--algeria-red) 0%, #b30d2c 100%);
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 5px 20px rgba(210, 16, 52, 0.4);
+        }
+        
+        .btn-predict:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(210, 16, 52, 0.5);
+            background: linear-gradient(135deg, #e01138 0%, var(--algeria-red) 100%);
+            color: white;
+        }
+        
+        /* Price result */
+        .price-result {
+            background: linear-gradient(135deg, var(--algeria-green) 0%, var(--algeria-green-light) 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .price-result::before {
+            content: '🇩🇿';
+            position: absolute;
+            font-size: 8rem;
+            opacity: 0.1;
+            right: -20px;
+            top: -20px;
+        }
+        
+        .price-result h3 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .price-result .currency {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        
+        .price-result .dzd-label {
+            background: var(--algeria-red);
+            padding: 5px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 2rem;
+        }
+        
+        .footer a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .footer .flag-emoji {
+            font-size: 1.5rem;
+            margin: 0 5px;
+        }
+        
+        /* Hero image section */
+        .hero-image {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-image img {
+            max-width: 500px;
+        }
+        
+        /* Map section */
+        .map-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .map-section h5 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .map-section img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Table styling */
+        .table th {
+            color: var(--algeria-green);
+            font-weight: 600;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero-image img {
+                max-width: 200px;
+            }
+            
+            .btn-predict {
+                padding: 0.8rem 2rem;
+                font-size: 1rem;
+            }
+            
+            .price-result h3 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .form-section {
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .form-section:nth-child(1) { animation-delay: 0.1s; }
+        .form-section:nth-child(2) { animation-delay: 0.2s; }
+        .form-section:nth-child(3) { animation-delay: 0.3s; }
+        .form-section:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="container main-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="hero-image">
+                <img src="{% static 'predictor/images/dataset-cover.png' %}" alt="Algerian Laptop Market">
+            </div>
+            <h1>
+                Algerian <span class="algeria-star">🇩🇿</span> Laptop Price Predictor
+            </h1>
+        </div>
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <footer class="footer">
+        <p class="small opacity-75">
+            &copy; Built by ENSIA students: Kadouci Abdelhak, Ahmed Fateh, Cherdouh Yassir, Abdennour Souaci 2026
+        </p>
+        <p class="small opacity-60">
+            Dataset: <a href="https://www.kaggle.com/datasets/kadouciabdelhak/algeria-laptop-price-prediction-dataset-cleaned" target="_blank" class="text-white">Algeria Laptop Price Dataset</a>
+            Model & website: <a href="https://github.com/abdelhak-k/Algeria-laptop-price-prediction-website" target="_blank" class="text-white">GitHub Repository</a>
+        </p>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
