@@ -2,6 +2,7 @@
 
 A Django web application that predicts laptop prices in the Algerian market using machine learning.
 
+The website is working and is deployed on: https://laptopdz.leapcell.app/
 ## Overview
 
 This project uses a trained Linear Regression model to predict laptop prices based on specifications like brand, series, CPU, GPU, RAM, storage, and condition. The model achieves 88.1% accuracy (R² score) with a Mean Absolute Error of 19,316 DZD.
