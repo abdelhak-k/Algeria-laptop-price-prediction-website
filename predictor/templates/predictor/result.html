@@ -56,7 +56,7 @@
                                 </tr>
                                 <tr>
                                     <th>RAM:</th>
-                                    <td>{{ form_data.ram_size_gb }} GB</td>
+                                    <td>{{ form_data.ram_size_gb }} GB {% if form_data.ram_type_class and form_data.ram_type_class != 'Unknown' %}({{ form_data.ram_type_class }}){% endif %}</td>
                                 </tr>
                                 <tr>
                                     <th>SSD:</th>
@@ -65,6 +65,10 @@
                                 <tr>
                                     <th>HDD:</th>
                                     <td>{% if form_data.hdd_size_gb %}{{ form_data.hdd_size_gb }} GB{% else %}None{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <th>Screen:</th>
+                                    <td>{{ form_data.screen_size }}" {% if form_data.resolution_class and form_data.resolution_class != 'Unknown' %}({{ form_data.resolution_class }}){% endif %}</td>
                                 </tr>
                                 <tr>
                                     <th>Year:</th>

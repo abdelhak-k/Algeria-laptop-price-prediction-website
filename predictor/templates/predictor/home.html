@@ -110,19 +110,43 @@
                             <h5 class="mb-0">Memory & Storage</h5>
                         </div>
                         <div class="row">
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">RAM Size (GB)</label>
                                 {{ form.ram_size_gb }}
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">RAM Type</label>
+                                {{ form.ram_type_class }}
+                            </div>
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">SSD Size (GB)</label>
                                 {{ form.ssd_size_gb }}
                                 <small class="text-muted">Enter 0 if no SSD</small>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">HDD Size (GB)</label>
                                 {{ form.hdd_size_gb }}
                                 <small class="text-muted">Enter 0 if no HDD</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Display -->
+                    <div class="form-section">
+                        <div class="section-icon">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-desktop"></i>
+                            </div>
+                            <h5 class="mb-0">Display</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Screen Size</label>
+                                {{ form.screen_size }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Screen Resolution</label>
+                                {{ form.resolution_class }}
                             </div>
                         </div>
                     </div>

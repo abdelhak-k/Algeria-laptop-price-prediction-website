@@ -1,53 +1,40 @@
 ============================================================
 COMPLETE FEATURE LIST FOR PRICE PREDICTION MODEL
+(Gradient Boosting — R² ≈ 0.90)
 ============================================================
 
 NUMERIC FEATURES:
-  - RAM_SIZE_GB
-  - SSD_SIZE_GB
+  - RAM_SIZE_GB (log1p transformed)
+  - SSD_SIZE_GB (log1p transformed)
+  - cpu_mark (PassMark CPU benchmark score)
+  - cpu_single_thread (PassMark single-thread score)
+  - gpu_score (PassMark G3D GPU score)
+  - build_quality_tier (1-5, derived from series)
+  - condition_value_retention (0.60-1.00, derived from condition)
+  - cpu_generation (integer)
+  - storage_perf_score (0=none, 1=HDD, 2=SSD)
+  - cpu_cores (from PassMark lookup)
+  - inferred_ddr_ordinal (0=unknown, 3=DDR3, 4=DDR4, 5=DDR5)
+  - SCREEN_SIZE_NUM (inches)
+  - cpu_threads (threads-per-core from PassMark)
 
 BINARY FEATURES:
   - is_pro
+  - is_gaming_series (derived from series name)
+  - has_gpu (derived from gpu_tier != NONE)
 
 CATEGORICAL FEATURES (One-Hot Encoded):
-  - series_AERO
-  - series_ALIENWARE
-  - series_ASPIRE
-  - series_BLADE
-  - series_ELITEBOOK
-  - series_ENVY
-  - series_IDEAPAD
-  - series_INSPIRON
-  - series_KATANA
-  - series_LATITUDE
-  - series_LEGION
-  - series_MACBOOK
-  - series_NITRO
-  - series_OMEN
-  - series_PAVILION
-  - series_PRECISION
-  - series_PREDATOR
-  - series_PROBOOK
-  - series_ROG
-  - series_SPECTRE
-  - series_SPIN
-  - series_SWIFT
-  - series_SWORD
-  - series_THINKBOOK
-  - series_THINKPAD
-  - series_TRAVELMATE
-  - series_TUF
-  - series_UNKNOWN
-  - series_VICTUS
-  - series_VIVOBOOK
-  - series_VOSTRO
-  - series_XPS
-  - series_YOGA
-  - series_ZBOOK
-  - series_ZENBOOK
-  - cpu_family_SNAPDRAGON
-  - cpu_family_UNKNOWN
-  - cpu_family_celeron
+  - series
+  - cpu_family
+  - gpu_tier
+  - condition
+  - gpu_suffix
+  - cpu_suffix
+  - cpu_gen_brand
+  - listing_year
+  - brand
+  - ram_type_class
+  - resolution_class
   - cpu_family_i3
   - cpu_family_i5
   - cpu_family_i7

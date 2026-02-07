@@ -252,6 +252,37 @@ CONDITION_CHOICES = [
     ('UNKNOWN', 'Unknown'),
 ]
 
+RAM_TYPE_CHOICES = [
+    ('Unknown', 'Unknown'),
+    ('DDR3', 'DDR3'),
+    ('DDR4', 'DDR4'),
+    ('LPDDR4x', 'LPDDR4x'),
+    ('DDR5', 'DDR5'),
+    ('LPDDR5', 'LPDDR5'),
+    ('LPDDR5X', 'LPDDR5X'),
+]
+
+RESOLUTION_CLASS_CHOICES = [
+    ('Unknown', 'Unknown'),
+    ('HD', 'HD (1366×768)'),
+    ('FHD', 'Full HD (1920×1080)'),
+    ('FHD+ / WUXGA', 'FHD+ / WUXGA (1920×1200)'),
+    ('QHD / 2K', 'QHD / 2K (2560×1440)'),
+    ('QHD+ / 3K', 'QHD+ / 3K (2560×1600+)'),
+    ('UHD / 4K+', 'UHD / 4K+ (3840×2160+)'),
+]
+
+SCREEN_SIZE_CHOICES = [
+    (13.3, '13.3"'),
+    (13.6, '13.6"'),
+    (14.0, '14.0"'),
+    (14.2, '14.2"'),
+    (15.6, '15.6"'),
+    (16.0, '16.0"'),
+    (16.1, '16.1"'),
+    (17.3, '17.3"'),
+]
+
 
 class LaptopSpecsForm(forms.Form):
     # Basic Info
@@ -318,6 +349,26 @@ class LaptopSpecsForm(forms.Form):
         initial=0,
         required=False,
         widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 500, 1000 (0 if none)'})
+    )
+    ram_type_class = forms.ChoiceField(
+        choices=RAM_TYPE_CHOICES,
+        initial='Unknown',
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    
+    # Display
+    screen_size = forms.TypedChoiceField(
+        choices=SCREEN_SIZE_CHOICES,
+        coerce=float,
+        initial=15.6,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    resolution_class = forms.ChoiceField(
+        choices=RESOLUTION_CLASS_CHOICES,
+        initial='Unknown',
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     
     # Additional
