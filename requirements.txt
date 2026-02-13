@@ -6,3 +6,4 @@ pathlib2>=2.3.0
 python-dotenv
 gunicorn
 whitenoise
+psycopg2-binary
