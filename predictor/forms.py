@@ -273,6 +273,7 @@ RESOLUTION_CLASS_CHOICES = [
 ]
 
 SCREEN_SIZE_CHOICES = [
+    (0, 'Unknown'),
     (13.3, '13.3"'),
     (13.6, '13.6"'),
     (14.0, '14.0"'),
@@ -383,3 +384,42 @@ class LaptopSpecsForm(forms.Form):
         initial=2025,
         widget=forms.NumberInput(attrs={'class': 'form-control'})
     )
+
+
+class PredictionFeedbackForm(forms.Form):
+    """Form for collecting user feedback on predictions"""
+    
+    is_accurate = forms.ChoiceField(
+        label="Is the prediction close/accurate?",
+        choices=[
+            ('', 'Select an option'),
+            ('yes', 'Yes, it\'s accurate'),
+            ('close', 'Close enough'),
+            ('no', 'Not accurate'),
+        ],
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    
+    actual_price = forms.DecimalField(
+        label="If you know the correct price, please enter it (DZD)",
+        required=False,
+        min_value=0,
+        max_digits=12,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter actual price in DZD (optional)'
+        })
+    )
+    
+    feedback_text = forms.CharField(
+        label="Additional feedback",
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 3,
+            'placeholder': 'Share your thoughts about the prediction (optional)'
+        })
+    )
+

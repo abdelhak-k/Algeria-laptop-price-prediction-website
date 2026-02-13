@@ -9,6 +9,10 @@
             <div class="card-header text-center">
                 <h2><i class="fas fa-laptop me-2"></i></h2>
                 <p class="mb-0 mt-2 opacity-75">Enter your laptop specifications to get an estimated price in DZD</p>
+                <div class="alert alert-info mt-3 mb-0" style="font-size: 0.9rem;">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Note:</strong> All results are based on the quality of the data. The model was trained on old data (2018-2025), so you may notice some variations in the price.
+                </div>
             </div>
             <div class="card-body p-4">
                 <form method="post" action="{% url 'predictor:home' %}">
@@ -34,6 +38,12 @@
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">Condition</label>
                                 {{ form.condition }}
+                                <small class="text-muted d-block mt-1">
+                                    <strong>Please make sure to enter the right condition:</strong><br>
+                                    "Cartona" = Never used<br>
+                                    "Caba" = Good condition<br>
+                                    "Used" = Average condition
+                                </small>
                             </div>
                         </div>
                         <div class="row">
@@ -65,6 +75,13 @@
                                 <label class="form-label">Generation</label>
                                 {{ form.cpu_generation }}
                                 <small class="text-muted" id="generation-help"></small>
+                                <div id="ultra-note" style="display:none;">
+                                <small class="text-muted d-block mt-1">
+                                    <strong>Note:</strong> Ultra CPUs generations are only 1, 2, or 3.<br>
+                                    They correspond to Ultra 3-series, 2-series, 1-series.<br>
+                                    Any other generation is not valid for Ultra CPUs.
+                                </small>
+                                </div>
                             </div>
                             <div class="col-md-3 mb-3" id="suffix-container">
                                 <label class="form-label">CPU Suffix</label>
@@ -77,6 +94,9 @@
                                     {{ form.is_pro }}
                                     <label class="form-check-label">Professional/Business CPU</label>
                                 </div>
+                                <small class="text-muted d-block mt-1 ms-4">
+                                    Check this if the CPU contains "Pro" in it (e.g., PRO Ryzen, M1 Pro)
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -405,6 +425,72 @@
             generationSelect.disabled = false;
             generationHelp.textContent = '';
         }
+        
+        // Call handleCpuGeneration to update generation options
+        handleCpuGeneration();
+    }
+
+    // Handle CPU generation restrictions for Ultra and Ryzen
+    function handleCpuGeneration() {
+        const cpuFamilySelect = document.getElementById('id_cpu_family');
+        const cpuGenerationSelect = document.getElementById('id_cpu_generation');
+        const ultraNote = document.getElementById('ultra-note');
+        const selectedFamily = cpuFamilySelect.value;
+        
+        const ultraFamilies = ['ultra5', 'ultra7', 'ultra9'];
+        const ryzenFamilies = ['r3', 'r5', 'r7', 'r9'];
+        
+        if (ultraFamilies.includes(selectedFamily)) {
+            // Show Ultra CPU note
+            ultraNote.style.display = ''; // ✅ Changed from 'block' to ''
+            
+            // Restrict generation options to 1, 2, 3
+            if (cpuGenerationSelect) {
+                for (let i = 0; i < cpuGenerationSelect.options.length; i++) {
+                    const opt = cpuGenerationSelect.options[i];
+                    if (['1', '2', '3', '0'].includes(opt.value)) {
+                        opt.style.display = '';
+                    } else {
+                        opt.style.display = 'none';
+                    }
+                }
+                // If current value is not 1,2,3,0, reset to 1
+                if (!['1', '2', '3', '0'].includes(cpuGenerationSelect.value)) {
+                    cpuGenerationSelect.value = '1';
+                }
+            }
+        } else if (ryzenFamilies.includes(selectedFamily)) {
+            // Hide Ultra CPU note
+            ultraNote.style.display = 'none';
+            
+            // Restrict Ryzen generations to 1-10
+            if (cpuGenerationSelect) {
+                for (let i = 0; i < cpuGenerationSelect.options.length; i++) {
+                    const opt = cpuGenerationSelect.options[i];
+                    const genValue = parseInt(opt.value);
+                    if (opt.value === '0' || (genValue >= 1 && genValue <= 10)) {
+                        opt.style.display = '';
+                    } else {
+                        opt.style.display = 'none';
+                    }
+                }
+                // If current value is > 10, reset to a valid value
+                const currentGen = parseInt(cpuGenerationSelect.value);
+                if (currentGen > 10) {
+                    cpuGenerationSelect.value = '7'; // Default to gen 7
+                }
+            }
+        } else {
+            // Hide Ultra CPU note for non-Ultra CPUs
+            ultraNote.style.display = 'none';
+            
+            // Show all generation options for other CPUs
+            if (cpuGenerationSelect) {
+                for (let i = 0; i < cpuGenerationSelect.options.length; i++) {
+                    cpuGenerationSelect.options[i].style.display = '';
+                }
+            }
+        }
     }
 
     // Initialize on page load
@@ -412,11 +498,15 @@
         const brandSelect = document.getElementById('id_brand');
         const cpuBrandSelect = document.getElementById('id_cpu_brand');
         const cpuFamilySelect = document.getElementById('id_cpu_family');
+        const cpuGenerationSelect = document.getElementById('id_cpu_generation');
         
         // Add event listeners
         brandSelect.addEventListener('change', updateSeriesDropdown);
         cpuBrandSelect.addEventListener('change', updateCpuFamilyDropdown);
-        cpuFamilySelect.addEventListener('change', updateGenerationVisibility);
+        cpuFamilySelect.addEventListener('change', function() {
+            updateGenerationVisibility();
+            handleCpuGeneration();
+        });
         
         // Initialize dropdowns if values are already set
         if (brandSelect.value) {
@@ -428,6 +518,7 @@
         }
         if (cpuFamilySelect.value) {
             updateGenerationVisibility();
+            handleCpuGeneration();
         }
     });
 </script>

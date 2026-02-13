@@ -139,74 +139,127 @@ def _load_gpu_passmark():
     return _gpu_passmark_cache
 
 
-def _lookup_cpu_scores(cpu_family, cpu_generation, cpu_suffix, cpu_brand):
+def _lookup_cpu_scores(cpu_family, cpu_generation, cpu_suffix, cpu_brand, is_pro=False):
     """
     Attempt to look up CPU PassMark scores by building likely CPU names.
-    Returns (cpu_mark, cpu_single_thread, cpu_cores, cpu_threads) or Nones.
+    Returns (cpu_mark, cpu_single_thread, cpu_cores, cpu_threads, match_info) or Nones.
     """
     passmark = _load_cpu_passmark()
     if not passmark:
-        return None, None, None, None
+        return None, None, None, None, None
 
     gen = int(cpu_generation) if cpu_generation else 0
     suffix_str = cpu_suffix.upper() if cpu_suffix else ''
 
     search_names = []
 
+    # ===== Intel Core i3, i5, i7, i9 =====
     if cpu_family in ('i3', 'i5', 'i7', 'i9'):
         family_upper = cpu_family.upper()
-        base_numbers = {
-            'i3': f'{gen}100', 'i5': f'{gen}500',
-            'i7': f'{gen}700', 'i9': f'{gen}900',
-        }
-        num = base_numbers.get(cpu_family, f'{gen}00')
-        search_names.append(f'INTEL CORE {family_upper}-{num}{suffix_str}')
-        search_names.append(f'INTEL CORE {family_upper}-{num}')
+        variant = "XXX"
+        model_num = f'{gen}{variant}'
+        search_names.append(f'INTEL CORE {family_upper}-{model_num}{suffix_str}')
 
+    # ===== AMD Ryzen 3, 5, 7, 9 =====
     elif cpu_family in ('r3', 'r5', 'r7', 'r9'):
         ryzen_map = {'r3': 'RYZEN 3', 'r5': 'RYZEN 5', 'r7': 'RYZEN 7', 'r9': 'RYZEN 9'}
         ryzen_name = ryzen_map[cpu_family]
+        
         if gen > 0:
-            search_names.append(f'AMD {ryzen_name} {gen}600{suffix_str}')
-            search_names.append(f'AMD {ryzen_name} {gen}600')
-        search_names.append(f'AMD {ryzen_name}')
+            variant = 'XXX'
+            model_num = f'{gen}{variant}'
+            if is_pro:
+                search_names.append(f'AMD {ryzen_name} PRO {model_num}{suffix_str}')
+            else:
+                search_names.append(f'AMD {ryzen_name} {model_num}{suffix_str}')
 
+    # ===== Apple Silicon (M1, M2, M3, M4) =====
     elif cpu_family in ('m1', 'm2', 'm3', 'm4'):
         apple_name = cpu_family.upper()
-        if suffix_str:
+        if suffix_str in ('PRO', 'MAX', 'ULTRA'):
             search_names.append(f'APPLE {apple_name} {suffix_str}')
-        search_names.append(f'APPLE {apple_name}')
+        else:
+            search_names.append(f'APPLE {apple_name}')
 
+    # ===== Intel Core Ultra (Ultra 5, 7, 9) =====
     elif cpu_family in ('ultra5', 'ultra7', 'ultra9'):
         ultra_num = cpu_family.replace('ultra', '')
-        search_names.append(f'INTEL CORE ULTRA {ultra_num}')
+        if gen in [1, 2, 3]:
+            variant = 'XX'
+            search_names.append(f'INTEL CORE ULTRA {ultra_num} {gen}{variant}{suffix_str}')
+            
+    # ===== Other processors =====
+    elif cpu_family in ('celeron', 'pentium', 'xeon'):
+        family_name = cpu_family.upper()
+        search_names.append(f'INTEL {family_name}')
+        
+    elif cpu_family == 'SNAPDRAGON':
+        search_names.append('QUALCOMM SNAPDRAGON')
+        search_names.append('SNAPDRAGON')
 
-    # Try exact matches first, then partial matches
+    # Try fuzzy matching based on POSITIONAL character similarity
+    best_match = None
+    best_match_data = None
+    max_similarity = 0
+    search_name_used = None
+    
     for name in search_names:
-        if name in passmark:
-            d = passmark[name]
-            return d['cpumark'], d['single_thread'], d['cores'], d['threads']
-
-    # Try partial matching
-    for name in search_names:
+        # Clean the search name once
+        name_clean = name.upper().replace('-', '').replace(' ', '')
+        
         for key, d in passmark.items():
-            if name in key:
-                return d['cpumark'], d['single_thread'], d['cores'], d['threads']
+            # Clean the database key
+            key_clean = key.upper().replace('-', '').replace(' ', '')
+            
+            # Count characters that match in the SAME POSITION
+            matching_positions = 0
+            min_len = min(len(name_clean), len(key_clean))
+            
+            for i in range(min_len):
+                if name_clean[i] == key_clean[i]:
+                    matching_positions += 1
+            
+            # Calculate similarity as ratio of matching positions to search name length
+            similarity = matching_positions / len(name_clean) if len(name_clean) > 0 else 0
+            
+            # Update best match
+            if similarity > max_similarity:
+                max_similarity = similarity
+                best_match = key
+                best_match_data = d
+                search_name_used = name
+    
+    # Prepare match info dictionary
+    match_info = None
+    if best_match:
+        match_info = {
+            'matched_cpu': best_match,
+            'search_pattern': search_name_used,
+            'similarity': round(max_similarity * 100, 2),  # Convert to percentage
+        }
+    
+    if best_match_data:
+        return (
+            best_match_data['cpumark'], 
+            best_match_data['single_thread'], 
+            best_match_data['cores'], 
+            best_match_data['threads'],
+            match_info
+        )
 
-    return None, None, None, None
-
+    return None, None, None, None, None
 
 def _lookup_gpu_score(gpu_tier, gpu_suffix):
     """
     Attempt to look up GPU PassMark G3D score.
-    Returns gpu_score or None.
+    Returns (gpu_score, match_info) or (None, None).
     """
     if gpu_tier == 'NONE':
-        return 0.0
+        return 0.0, None
 
     passmark = _load_gpu_passmark()
     if not passmark:
-        return None
+        return None, None
 
     suffix_str = f' {gpu_suffix.upper()}' if gpu_suffix else ''
 
@@ -231,18 +284,61 @@ def _lookup_gpu_score(gpu_tier, gpu_suffix):
     else:
         search_names.append(gpu_tier.upper())
 
-    # Try exact matches
+    # Try exact matches first
     for name in search_names:
         if name in passmark:
-            return passmark[name]['g3d']
+            match_info = {
+                'matched_gpu': name,
+                'search_pattern': name,
+                'similarity': 100.0,
+                'match_type': 'exact'
+            }
+            return passmark[name]['g3d'], match_info
 
-    # Try partial matching
+    # Try fuzzy matching based on positional character similarity
+    best_match = None
+    best_match_data = None
+    max_similarity = 0
+    search_name_used = None
+    
     for name in search_names:
+        # Clean the search name
+        name_clean = name.upper().replace('-', '').replace(' ', '')
+        
         for key, d in passmark.items():
-            if name in key:
-                return d['g3d']
+            # Clean the database key
+            key_clean = key.upper().replace('-', '').replace(' ', '')
+            
+            # Count characters that match in the SAME POSITION
+            matching_positions = 0
+            min_len = min(len(name_clean), len(key_clean))
+            
+            for i in range(min_len):
+                if name_clean[i] == key_clean[i]:
+                    matching_positions += 1
+            
+            # Calculate similarity
+            similarity = matching_positions / len(name_clean) if len(name_clean) > 0 else 0
+            
+            # Update best match
+            if similarity > max_similarity:
+                max_similarity = similarity
+                best_match = key
+                best_match_data = d
+                search_name_used = name
 
-    return None
+    # Prepare match info
+    match_info = None
+    if best_match:
+        match_info = {
+            'matched_gpu': best_match,
+            'search_pattern': search_name_used,
+            'similarity': round(max_similarity * 100, 2),
+            'match_type': 'fuzzy'
+        }
+        return best_match_data['g3d'], match_info
+
+    return None, None
 
 
 def load_model():
@@ -269,6 +365,7 @@ def prepare_input_data(form_data):
     Transform user form data into the DataFrame expected by the model preprocessor.
     Computes all derived features (build_quality_tier, condition_value_retention, etc.)
     """
+    # --- Define all basic variables first ---
     cpu_family = form_data['cpu_family']
     brand = form_data['brand']
     series = form_data['series']
@@ -293,6 +390,10 @@ def prepare_input_data(form_data):
     if cpu_family in ['m1', 'm2', 'm3', 'm4', 'SNAPDRAGON', 'UNKNOWN']:
         cpu_generation = '0'
 
+    # --- CPU suffix ---
+    cpu_suffix = form_data.get('cpu_suffix', '') or ''
+
+    # --- CPU gen_brand ---
     cpu_gen_brand = f"{cpu_brand}_{int(cpu_generation)}"
 
     # --- Log transform RAM and SSD (matching notebook) ---
@@ -304,7 +405,6 @@ def prepare_input_data(form_data):
     # --- GPU fields ---
     gpu_tier = form_data.get('gpu_tier', 'NONE') or 'NONE'
     gpu_suffix = form_data.get('gpu_suffix', '') or ''
-    cpu_suffix = form_data.get('cpu_suffix', '') or ''
 
     # --- Derived: has_gpu ---
     has_gpu = 1 if gpu_tier != 'NONE' else 0
@@ -338,11 +438,12 @@ def prepare_input_data(form_data):
     if screen_size is None:
         screen_size = 15.6
 
-    # --- PassMark lookups ---
-    cpu_mark, cpu_single_thread, cpu_cores, cpu_threads = _lookup_cpu_scores(
-        cpu_family, cpu_generation, cpu_suffix, cpu_brand
+    # --- PassMark lookups (NOW all variables are defined) ---
+    cpu_mark, cpu_single_thread, cpu_cores, cpu_threads, cpu_match_info = _lookup_cpu_scores(
+        cpu_family, cpu_generation, cpu_suffix, cpu_brand, 
+        is_pro=form_data.get('is_pro', False)
     )
-    gpu_score = _lookup_gpu_score(gpu_tier, gpu_suffix)
+    gpu_score, gpu_match_info = _lookup_gpu_score(gpu_tier, gpu_suffix)
 
     # Use NaN for missing values — the preprocessor's SimpleImputer will handle them
     if cpu_mark is None:
@@ -397,21 +498,151 @@ def prepare_input_data(form_data):
     all_features = FEAT_NUMERIC + FEAT_BINARY + FEAT_CATEGORICAL
     df = df[all_features]
 
-    return df
+    return df, cpu_match_info, gpu_match_info
+def get_feature_importance(model, preprocessor, top_n=10):
+    """
+    Get the top N most important features from the model.
+    Returns a list of dicts with feature names and their importance scores.
+    """
+    try:
+        # Check if model has feature_importances_ attribute
+        if not hasattr(model, 'feature_importances_'):
+            return []
+        
+        importances = model.feature_importances_
+        
+        # Get feature names after preprocessing
+        feature_names = preprocessor.get_feature_names_out()
+        
+        # Create list of (feature_name, importance) tuples
+        feature_imp = list(zip(feature_names, importances))
+        
+        # Sort by importance (descending)
+        feature_imp_sorted = sorted(feature_imp, key=lambda x: x[1], reverse=True)
+        
+        # Return top N features
+        top_features = feature_imp_sorted[:top_n]
+        
+        # Format as a more readable list of dicts
+        result = [
+            {
+                'feature': _clean_feature_name(feat),
+                'importance': round(imp * 100, 2),  # Convert to percentage
+                'importance_formatted': f"{imp * 100:.2f}%"
+            }
+            for feat, imp in top_features
+        ]
+        
+        return result
+        
+    except Exception as e:
+        # If anything goes wrong, return empty list
+        return []
+
+
+def _clean_feature_name(feature_name):
+    """
+    Clean up feature names from preprocessor output for better readability.
+    Example: 'cat__brand_ASUS' -> 'Brand: ASUS'
+    """
+    # Remove pipeline step prefixes (e.g., 'num__', 'cat__')
+    if '__' in feature_name:
+        feature_name = feature_name.split('__', 1)[1]
+    
+    # Replace underscores with spaces and title case
+    feature_name = feature_name.replace('_', ' ').title()
+    
+    return feature_name
+
+
+def _get_feature_values(input_df):
+    """
+    Extract and format the actual feature values used for prediction.
+    Returns a dict with categorized features.
+    """
+    row = input_df.iloc[0]
+    
+    # Numeric features with descriptions
+    numeric_features = [
+        {'name': 'CPU Mark (PassMark)', 'value': row['cpu_mark'], 'format': '.0f'},
+        {'name': 'CPU Single Thread Score', 'value': row['cpu_single_thread'], 'format': '.0f'},
+        {'name': 'CPU Cores', 'value': row['cpu_cores'], 'format': '.0f'},
+        {'name': 'CPU Threads', 'value': row['cpu_threads'], 'format': '.0f'},
+        {'name': 'GPU Score (PassMark G3D)', 'value': row['gpu_score'], 'format': '.0f'},
+        {'name': 'RAM Size (log-transformed)', 'value': row['RAM_SIZE_GB'], 'format': '.2f'},
+        {'name': 'SSD Size (log-transformed)', 'value': row['SSD_SIZE_GB'], 'format': '.2f'},
+        {'name': 'Screen Size', 'value': row['SCREEN_SIZE_NUM'], 'format': '.1f'},
+        {'name': 'CPU Generation', 'value': row['cpu_generation'], 'format': '.0f'},
+    ]
+    
+    # Derived features
+    derived_features = [
+        {'name': 'Build Quality Tier', 'value': row['build_quality_tier'], 'format': '.0f', 'description': '(1=Budget to 5=Flagship)'},
+        {'name': 'Condition Value Retention', 'value': row['condition_value_retention'], 'format': '.2f', 'description': '(0.0 to 1.0)'},
+        {'name': 'Storage Performance Score', 'value': row['storage_perf_score'], 'format': '.0f', 'description': '(0=None, 1=HDD, 2=SSD)'},
+        {'name': 'DDR Generation (Ordinal)', 'value': row['inferred_ddr_ordinal'], 'format': '.0f', 'description': '(3=DDR3, 4=DDR4, 5=DDR5)'},
+    ]
+    
+    # Binary features
+    binary_features = [
+        {'name': 'Has Dedicated GPU', 'value': 'Yes' if row['has_gpu'] == 1 else 'No'},
+        {'name': 'Is Gaming Series', 'value': 'Yes' if row['is_gaming_series'] == 1 else 'No'},
+        {'name': 'Is Professional', 'value': 'Yes' if row['is_pro'] == 1 else 'No'},
+    ]
+    
+    # Categorical features
+    categorical_features = [
+        {'name': 'Brand', 'value': row['brand']},
+        {'name': 'Series', 'value': row['series']},
+        {'name': 'CPU Family', 'value': row['cpu_family']},
+        {'name': 'CPU Gen + Brand', 'value': row['cpu_gen_brand']},
+        {'name': 'GPU Tier', 'value': row['gpu_tier']},
+        {'name': 'Condition', 'value': row['condition']},
+        {'name': 'RAM Type', 'value': row['ram_type_class']},
+        {'name': 'Resolution Class', 'value': row['resolution_class']},
+        {'name': 'Listing Year', 'value': row['listing_year']},
+    ]
+    
+    # Format numeric values
+    for feat in numeric_features:
+        val = feat['value']
+        if pd.isna(val):
+            feat['value_formatted'] = 'N/A (imputed by model)'
+        else:
+            feat['value_formatted'] = f"{val:{feat['format']}}"
+    
+    for feat in derived_features:
+        val = feat['value']
+        feat['value_formatted'] = f"{val:{feat['format']}}"
+    
+    return {
+        'numeric': numeric_features,
+        'derived': derived_features,
+        'binary': binary_features,
+        'categorical': categorical_features,
+    }
 
 
 def predict_price(form_data):
     try:
         model, preprocessor = load_model()
-        input_df = prepare_input_data(form_data)
+        input_df, cpu_match_info, gpu_match_info = prepare_input_data(form_data)  # Unpack all three
+        
         X = preprocessor.transform(input_df)
+        
         y_log = model.predict(X)
         predicted_price = np.expm1(y_log[0])
         predicted_price = max(predicted_price, 10000)
 
-        model_rmse = 28000  # Approximate RMSE for the Gradient Boosting model
+        model_rmse = 28000
         min_price = max(predicted_price - model_rmse, 5000)
         max_price = predicted_price + model_rmse
+
+        # Get feature importance
+        feature_importance = get_feature_importance(model, preprocessor)
+        
+        # Get feature values used for prediction
+        feature_values = _get_feature_values(input_df)
 
         return {
             'success': True,
@@ -420,7 +651,11 @@ def predict_price(form_data):
             'min_price': round(min_price, 0),
             'max_price': round(max_price, 0),
             'min_price_formatted': f"{min_price:,.0f} DZD",
-            'max_price_formatted': f"{max_price:,.0f} DZD"
+            'max_price_formatted': f"{max_price:,.0f} DZD",
+            'feature_importance': feature_importance,
+            'feature_values': feature_values,
+            'cpu_match_info': cpu_match_info,
+            'gpu_match_info': gpu_match_info  # Add GPU match info
         }
 
     except FileNotFoundError as e:

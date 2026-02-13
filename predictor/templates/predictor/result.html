@@ -78,6 +78,196 @@
                         </div>
                     </div>
                 </div>
+                <!-- Hardware Match Information -->
+                {% if result.cpu_match_info or result.gpu_match_info %}
+                <div class="form-section mt-4">
+                    <h5><i class="fas fa-search me-2"></i>Hardware Match Information</h5>
+                    <p class="text-muted small mb-3">These are the actual hardware components from our database that were used to estimate performance:</p>
+                    
+                    <div class="row">
+                        <!-- CPU Match Info -->
+                        {% if result.cpu_match_info %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0"><i class="fas fa-microchip me-2"></i>CPU Match</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-2">
+                                        <strong>Search Pattern:</strong><br>
+                                        <code class="d-block mt-1">{{ result.cpu_match_info.search_pattern }}</code>
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Matched CPU:</strong><br>
+                                        <span class="badge bg-success mt-1">{{ result.cpu_match_info.matched_cpu }}</span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Similarity:</strong>
+                                        <div class="progress mt-2" style="height: 25px;">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                style="width: {{ result.cpu_match_info.similarity }}%;" 
+                                                aria-valuenow="{{ result.cpu_match_info.similarity }}" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                                {{ result.cpu_match_info.similarity }}%
+                                            </div>
+                                        </div>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- GPU Match Info -->
+                        {% if result.gpu_match_info %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0"><i class="fas fa-tv me-2"></i>GPU Match</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="mb-2">
+                                        <strong>Search Pattern:</strong><br>
+                                        <code class="d-block mt-1">{{ result.gpu_match_info.search_pattern }}</code>
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Matched GPU:</strong><br>
+                                        <span class="badge bg-success mt-1">{{ result.gpu_match_info.matched_gpu }}</span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Similarity:</strong>
+                                        {% if result.gpu_match_info.match_type == 'exact' %}
+                                        <div class="alert alert-success mt-2 mb-0 py-2">
+                                            <i class="fas fa-check-circle me-1"></i>Exact Match (100%)
+                                        </div>
+                                        {% else %}
+                                        <div class="progress mt-2" style="height: 25px;">
+                                            <div class="progress-bar bg-info" role="progressbar" 
+                                                style="width: {{ result.gpu_match_info.similarity }}%;" 
+                                                aria-valuenow="{{ result.gpu_match_info.similarity }}" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                                {{ result.gpu_match_info.similarity }}%
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                <!-- Feature Values Used for Prediction -->
+                {% if result.feature_values %}
+                <div class="form-section mt-4">
+                    <h5><i class="fas fa-calculator me-2"></i>Feature Values Used for Prediction</h5>
+                    <p class="text-muted small mb-3">These are the actual computed values that were fed into the machine learning model:</p>
+                    
+                    <!-- Performance Metrics -->
+                    <h6 class="mt-3 mb-2"><i class="fas fa-tachometer-alt me-2"></i>Performance Metrics</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for feat in result.feature_values.numeric %}
+                                <tr>
+                                    <td>{{ feat.name }}</td>
+                                    <td><strong>{{ feat.value_formatted }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Derived Features -->
+                    <h6 class="mt-3 mb-2"><i class="fas fa-cogs me-2"></i>Derived Features</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for feat in result.feature_values.derived %}
+                                <tr>
+                                    <td>{{ feat.name }} <span class="text-muted small">{{ feat.description }}</span></td>
+                                    <td><strong>{{ feat.value_formatted }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Binary & Categorical Features -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mt-3 mb-2"><i class="fas fa-toggle-on me-2"></i>Binary Features</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <tbody>
+                                        {% for feat in result.feature_values.binary %}
+                                        <tr>
+                                            <td>{{ feat.name }}</td>
+                                            <td><strong>{{ feat.value }}</strong></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mt-3 mb-2"><i class="fas fa-tags me-2"></i>Categorical Features</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <tbody>
+                                        {% for feat in result.feature_values.categorical %}
+                                        <tr>
+                                            <td>{{ feat.name }}</td>
+                                            <td><strong>{{ feat.value }}</strong></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Feature Importance -->
+                {% if result.feature_importance %}
+                <div class="form-section mt-4">
+                    <h5><i class="fas fa-chart-bar me-2"></i>What Matters Most for This Price</h5>
+                    <p class="text-muted small mb-3">Top factors influencing this laptop's price prediction:</p>
+                    <div class="feature-importance-list">
+                        {% for feature in result.feature_importance %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-medium">{{ forloop.counter }}. {{ feature.feature }}</span>
+                                <span class="badge bg-primary">{{ feature.importance_formatted }}</span>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar" role="progressbar" 
+                                     style="width: {{ feature.importance }}%;" 
+                                     aria-valuenow="{{ feature.importance }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
                 
                 {% else %}
                 <div class="alert alert-danger" role="alert">
@@ -95,6 +285,64 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Feedback Form Card -->
+        {% if result.success %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Help Us Improve</h5>
+            </div>
+            <div class="card-body p-4">
+                <p class="text-muted mb-3">Your feedback helps us improve our prediction model. Please share your experience:</p>
+                
+                <form method="post" action="{% url 'predictor:submit_feedback' %}">
+                    {% csrf_token %}
+                    
+                    <!-- Hidden fields to store laptop specs and prediction -->
+                    <input type="hidden" name="predicted_price" value="{{ result.predicted_price }}">
+                    <input type="hidden" name="brand" value="{{ form_data.brand }}">
+                    <input type="hidden" name="series" value="{{ form_data.series }}">
+                    <input type="hidden" name="condition" value="{{ form_data.condition }}">
+                    <input type="hidden" name="listing_year" value="{{ form_data.listing_year }}">
+                    <input type="hidden" name="cpu_brand" value="{{ form_data.cpu_brand }}">
+                    <input type="hidden" name="cpu_family" value="{{ form_data.cpu_family }}">
+                    <input type="hidden" name="cpu_generation" value="{{ form_data.cpu_generation }}">
+                    <input type="hidden" name="cpu_suffix" value="{{ form_data.cpu_suffix }}">
+                    <input type="hidden" name="is_pro" value="{{ form_data.is_pro }}">
+                    <input type="hidden" name="gpu_tier" value="{{ form_data.gpu_tier }}">
+                    <input type="hidden" name="gpu_suffix" value="{{ form_data.gpu_suffix }}">
+                    <input type="hidden" name="ram_size_gb" value="{{ form_data.ram_size_gb }}">
+                    <input type="hidden" name="ram_type_class" value="{{ form_data.ram_type_class }}">
+                    <input type="hidden" name="ssd_size_gb" value="{{ form_data.ssd_size_gb }}">
+                    <input type="hidden" name="hdd_size_gb" value="{{ form_data.hdd_size_gb }}">
+                    <input type="hidden" name="screen_size" value="{{ form_data.screen_size }}">
+                    <input type="hidden" name="resolution_class" value="{{ form_data.resolution_class }}">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ feedback_form.is_accurate.label }}</label>
+                            {{ feedback_form.is_accurate }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ feedback_form.actual_price.label }}</label>
+                            {{ feedback_form.actual_price }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ feedback_form.feedback_text.label }}</label>
+                        {{ feedback_form.feedback_text }}
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
         
         <!-- Tips Card -->
         <div class="card">
