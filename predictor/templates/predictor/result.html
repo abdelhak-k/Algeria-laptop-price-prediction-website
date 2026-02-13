@@ -298,25 +298,8 @@
                 <form method="post" action="{% url 'predictor:submit_feedback' %}">
                     {% csrf_token %}
                     
-                    <!-- Hidden fields to store laptop specs and prediction -->
-                    <input type="hidden" name="predicted_price" value="{{ result.predicted_price }}">
-                    <input type="hidden" name="brand" value="{{ form_data.brand }}">
-                    <input type="hidden" name="series" value="{{ form_data.series }}">
-                    <input type="hidden" name="condition" value="{{ form_data.condition }}">
-                    <input type="hidden" name="listing_year" value="{{ form_data.listing_year }}">
-                    <input type="hidden" name="cpu_brand" value="{{ form_data.cpu_brand }}">
-                    <input type="hidden" name="cpu_family" value="{{ form_data.cpu_family }}">
-                    <input type="hidden" name="cpu_generation" value="{{ form_data.cpu_generation }}">
-                    <input type="hidden" name="cpu_suffix" value="{{ form_data.cpu_suffix }}">
-                    <input type="hidden" name="is_pro" value="{{ form_data.is_pro }}">
-                    <input type="hidden" name="gpu_tier" value="{{ form_data.gpu_tier }}">
-                    <input type="hidden" name="gpu_suffix" value="{{ form_data.gpu_suffix }}">
-                    <input type="hidden" name="ram_size_gb" value="{{ form_data.ram_size_gb }}">
-                    <input type="hidden" name="ram_type_class" value="{{ form_data.ram_type_class }}">
-                    <input type="hidden" name="ssd_size_gb" value="{{ form_data.ssd_size_gb }}">
-                    <input type="hidden" name="hdd_size_gb" value="{{ form_data.hdd_size_gb }}">
-                    <input type="hidden" name="screen_size" value="{{ form_data.screen_size }}">
-                    <input type="hidden" name="resolution_class" value="{{ form_data.resolution_class }}">
+                    <!-- Link feedback to the saved prediction log -->
+                    <input type="hidden" name="prediction_log_id" value="{{ prediction_log_id }}">
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">

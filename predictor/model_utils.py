@@ -198,7 +198,6 @@ def _lookup_cpu_scores(cpu_family, cpu_generation, cpu_suffix, cpu_brand, is_pro
         search_names.append('SNAPDRAGON')
 
     # Try fuzzy matching based on POSITIONAL character similarity
-    # First, try to find matches with the SAME generation
     best_match = None
     best_match_data = None
     max_similarity = 0
@@ -211,22 +210,6 @@ def _lookup_cpu_scores(cpu_family, cpu_generation, cpu_suffix, cpu_brand, is_pro
         for key, d in passmark.items():
             # Clean the database key
             key_clean = key.upper().replace('-', '').replace(' ', '')
-            
-            # CRITICAL: For Intel/AMD CPUs with generations, prioritize same-generation matches
-            if gen > 0 and cpu_family in ('i3', 'i5', 'i7', 'i9', 'r3', 'r5', 'r7', 'r9'):
-                # Check if the generation appears in the key
-                gen_str = str(gen)
-                
-                # For Intel 10th gen and above, check for the generation number
-                if gen >= 10:
-                    # Must start with the generation (e.g., "12" in "I5-12450")
-                    # Find the position after "I5-" or "RYZEN5"
-                    if f'I{cpu_family[-1]}{gen}' not in key_clean and f'RYZEN{cpu_family[-1]}{gen}' not in key_clean:
-                        continue  # Skip CPUs from different generations
-                else:
-                    # For older gens (6-9), look for single digit after family
-                    if f'I{cpu_family[-1]}{gen}' not in key_clean and f'RYZEN{cpu_family[-1]}{gen}' not in key_clean:
-                        continue
             
             # Count characters that match in the SAME POSITION
             matching_positions = 0
@@ -246,36 +229,13 @@ def _lookup_cpu_scores(cpu_family, cpu_generation, cpu_suffix, cpu_brand, is_pro
                 best_match_data = d
                 search_name_used = name
     
-    # If no match found with generation filter, try again WITHOUT the generation filter
-    if not best_match:
-        for name in search_names:
-            name_clean = name.upper().replace('-', '').replace(' ', '')
-            
-            for key, d in passmark.items():
-                key_clean = key.upper().replace('-', '').replace(' ', '')
-                
-                matching_positions = 0
-                min_len = min(len(name_clean), len(key_clean))
-                
-                for i in range(min_len):
-                    if name_clean[i] == key_clean[i]:
-                        matching_positions += 1
-                
-                similarity = matching_positions / len(name_clean) if len(name_clean) > 0 else 0
-                
-                if similarity > max_similarity:
-                    max_similarity = similarity
-                    best_match = key
-                    best_match_data = d
-                    search_name_used = name
-    
     # Prepare match info dictionary
     match_info = None
     if best_match:
         match_info = {
             'matched_cpu': best_match,
             'search_pattern': search_name_used,
-            'similarity': round(max_similarity * 100, 2),
+            'similarity': round(max_similarity * 100, 2),  # Convert to percentage
         }
     
     if best_match_data:
