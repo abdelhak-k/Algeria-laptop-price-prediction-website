@@ -2,10 +2,10 @@ from django.db import models
 from django.utils import timezone
 
 
-class PredictionLog(models.Model):
-    """Always store what features users entered and the prediction result"""
+class PredictionFeedback(models.Model):
+    """Store user feedback on price predictions"""
     
-    # Prediction result
+    # Prediction information
     predicted_price = models.DecimalField(max_digits=12, decimal_places=2)
     min_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     max_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
@@ -37,43 +37,19 @@ class PredictionLog(models.Model):
     screen_size = models.DecimalField(max_digits=4, decimal_places=2)
     resolution_class = models.CharField(max_length=20)
     
-    # Metadata
-    created_at = models.DateTimeField(default=timezone.now)
-    
-    class Meta:
-        ordering = ['-created_at']
-        verbose_name = 'Prediction Log'
-        verbose_name_plural = 'Prediction Logs'
-    
-    def __str__(self):
-        return f"Prediction - {self.brand} {self.series} - {self.predicted_price} DZD - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
-
-
-class PredictionFeedback(models.Model):
-    """Store user feedback on price predictions"""
-    
-    # Link to the prediction log
-    prediction = models.OneToOneField(
-        PredictionLog,
-        on_delete=models.CASCADE,
-        related_name='feedback',
-        null=True,
-        blank=True,
+    # User Feedback (all optional)
+    actual_price = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True,
+        help_text='The real price entered by the user (if known)'
     )
-    
-    # Feedback fields
     is_accurate = models.CharField(
-        max_length=20,
-        choices=[
-            ('yes', 'Yes, it\'s accurate'),
-            ('close', 'Close enough'),
-            ('no', 'Not accurate'),
-        ],
-        null=True,
-        blank=True
+        max_length=10, blank=True, default='',
+        help_text='User assessment: yes, close, or no'
     )
-    actual_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    feedback_text = models.TextField(blank=True, null=True)
+    feedback_text = models.TextField(
+        blank=True, default='',
+        help_text='Free-text feedback from the user'
+    )
     
     # Metadata
     created_at = models.DateTimeField(default=timezone.now)
@@ -84,6 +60,4 @@ class PredictionFeedback(models.Model):
         verbose_name_plural = 'Prediction Feedbacks'
     
     def __str__(self):
-        if self.prediction:
-            return f"Feedback for {self.prediction.brand} {self.prediction.series} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
-        return f"Feedback #{self.pk} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+        return f"Feedback - {self.brand} {self.series} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"

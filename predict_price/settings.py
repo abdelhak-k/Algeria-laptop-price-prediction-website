@@ -81,7 +81,7 @@ if DEV=="False":
             'PASSWORD': os.getenv('POSTGRES_DB_PASSWORD'),
             'HOST': os.getenv('POSTGRES_DB_HOST'),
             'PORT': os.getenv('POSTGRES_DB_PORT'),
-            'OPTIONS': {'sslmode': 'require'}
+            'OPTIONS': {'sslmode': os.getenv('POSTGRES_DB_SSLMODE')}
         }
     }
 else:
@@ -141,13 +141,3 @@ WHITENOISE_USE_FINDERS = True
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# Map Django message levels to Bootstrap alert classes
-from django.contrib.messages import constants as messages
-MESSAGE_TAGS = {
-    messages.DEBUG: 'secondary',
-    messages.INFO: 'info',
-    messages.SUCCESS: 'success',
-    messages.WARNING: 'warning',
-    messages.ERROR: 'danger',
-}
