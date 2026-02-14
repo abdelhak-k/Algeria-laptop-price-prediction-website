@@ -64,17 +64,22 @@ def home(request):
 
 
 def submit_feedback(request):
-    """Handle feedback submission — updates an existing prediction record"""
+    """Handle feedback submission — updates an existing prediction record. Returns JSON for AJAX."""
+    is_ajax = (
+        request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        or 'application/json' in request.headers.get('Accept', '')
+    )
+
     if request.method == 'POST':
         feedback_form = PredictionFeedbackForm(request.POST)
-        
+
         if feedback_form.is_valid():
             feedback_data = feedback_form.cleaned_data
             feedback_id = request.POST.get('feedback_id')
-            
+
             try:
                 feedback = get_object_or_404(PredictionFeedback, id=feedback_id)
-                
+
                 # Update only the feedback fields
                 if feedback_data.get('actual_price') is not None:
                     feedback.actual_price = feedback_data['actual_price']
@@ -82,15 +87,29 @@ def submit_feedback(request):
                     feedback.is_accurate = feedback_data['is_accurate']
                 if feedback_data.get('feedback_text'):
                     feedback.feedback_text = feedback_data['feedback_text']
-                
+
                 feedback.save()
+                if is_ajax:
+                    return JsonResponse({
+                        'success': True,
+                        'message': 'Thank you for your feedback! It will help us improve our predictions.',
+                    })
                 messages.success(request, 'Thank you for your feedback! It will help us improve our predictions.')
-                
             except Exception as e:
+                if is_ajax:
+                    return JsonResponse({'success': False, 'error': str(e)}, status=400)
                 messages.error(request, f'Error saving feedback: {str(e)}')
         else:
+            if is_ajax:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Please provide at least some feedback.',
+                    'errors': feedback_form.errors,
+                }, status=400)
             messages.warning(request, 'Please provide at least some feedback.')
-    
+
+    if is_ajax:
+        return JsonResponse({'success': False, 'error': 'POST required'}, status=405)
     return redirect('predictor:home')
 
 
