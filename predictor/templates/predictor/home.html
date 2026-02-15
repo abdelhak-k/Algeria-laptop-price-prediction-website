@@ -3,6 +3,16 @@
 {% block title %}Predict Laptop Price - Algerian Market{% endblock %}
 
 {% block content %}
+<style>
+    #predict-submit-btn[data-loading="true"] {
+        cursor: wait;
+        pointer-events: none;
+    }
+    #predict-submit-btn .btn-predict-loading .spinner-border {
+        border-color: rgba(255,255,255,.3);
+        border-right-color: #fff;
+    }
+</style>
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <div class="card">
@@ -15,7 +25,7 @@
                 </div>
             </div>
             <div class="card-body p-4">
-                <form method="post" action="{% url 'predictor:home' %}">
+                <form id="predict-form" method="post" action="{% url 'predictor:home' %}">
                     {% csrf_token %}
                     
                     <!-- Basic Information -->
@@ -172,8 +182,14 @@
                     </div>
                     
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary btn-predict">
-                            <i class="fas fa-calculator me-2"></i>Predict Price
+                        <button type="submit" id="predict-submit-btn" class="btn btn-primary btn-predict" data-loading="false">
+                            <span class="btn-predict-content">
+                                <i class="fas fa-calculator me-2"></i>Predict Price
+                            </span>
+                            <span class="btn-predict-loading d-none" aria-hidden="true">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Predicting...
+                            </span>
                         </button>
                     </div>
                 </form>
@@ -519,6 +535,21 @@
         if (cpuFamilySelect.value) {
             updateGenerationVisibility();
             handleCpuGeneration();
+        }
+
+        // Predict button loading state
+        const predictForm = document.getElementById('predict-form');
+        const predictBtn = document.getElementById('predict-submit-btn');
+        if (predictForm && predictBtn) {
+            const btnContent = predictBtn.querySelector('.btn-predict-content');
+            const btnLoading = predictBtn.querySelector('.btn-predict-loading');
+            predictForm.addEventListener('submit', function() {
+                if (predictBtn.getAttribute('data-loading') === 'true') return;
+                predictBtn.setAttribute('data-loading', 'true');
+                predictBtn.disabled = true;
+                if (btnContent) btnContent.classList.add('d-none');
+                if (btnLoading) btnLoading.classList.remove('d-none');
+            });
         }
     });
 </script>
