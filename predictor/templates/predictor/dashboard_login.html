@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Login | Laptop Predictor Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --algeria-green: #006233;
+            --algeria-green-light: #00843d;
+            --algeria-red: #d21034;
+        }
+        * { font-family: 'DM Sans', sans-serif; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #006233 0%, #004d26 50%, #006233 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+            overflow: hidden;
+            max-width: 420px;
+            width: 100%;
+        }
+        .login-card .card-header {
+            background: linear-gradient(135deg, var(--algeria-green) 0%, var(--algeria-green-light) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border: none;
+        }
+        .login-card .card-header h1 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+        .login-card .card-header p { margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.95rem; }
+        .login-card .card-body { padding: 2rem; }
+        .login-card .form-control {
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+        }
+        .login-card .form-control:focus {
+            border-color: var(--algeria-green);
+            box-shadow: 0 0 0 3px rgba(0,98,51,0.15);
+        }
+        .login-card .btn-login {
+            background: linear-gradient(135deg, var(--algeria-red) 0%, #b30d2c 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            width: 100%;
+        }
+        .login-card .btn-login:hover { background: linear-gradient(135deg, #e01138, var(--algeria-red)); color: white; }
+        .login-card .alert { border-radius: 12px; }
+        .back-link { color: rgba(255,255,255,0.9); text-decoration: none; margin-top: 1.5rem; display: inline-block; }
+        .back-link:hover { color: white; }
+    </style>
+</head>
+<body>
+    <div class="d-flex flex-column align-items-center">
+    <div class="login-card card">
+        <div class="card-header">
+            <h1><i class="fas fa-chart-line me-2"></i>Predictor Admin</h1>
+            <p>Sign in to access the dashboard</p>
+        </div>
+        <div class="card-body">
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors.0 }}</div>
+            {% endif %}
+            <form method="post" action="{% url 'predictor:dashboard_login' %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    <input type="text" name="username" id="id_username" class="form-control" required autofocus
+                           placeholder="Username" value="{{ form.username.value|default:'' }}">
+                    {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+                </div>
+                <div class="mb-4">
+                    <label for="id_password" class="form-label">Password</label>
+                    <input type="password" name="password" id="id_password" class="form-control" required placeholder="Password">
+                    {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn btn-login"><i class="fas fa-sign-in-alt me-2"></i>Sign in</button>
+            </form>
+        </div>
+    </div>
+    <a href="{% url 'predictor:home' %}" class="back-link"><i class="fas fa-arrow-left me-1"></i> Back to predictor</a>
+    </div>
+</body>
+</html>

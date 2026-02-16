@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} | Laptop Predictor Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --algeria-green: #006233;
+            --algeria-green-light: #00843d;
+            --algeria-red: #d21034;
+            --sidebar-bg: #001a0d;
+            --sidebar-width: 260px;
+        }
+        * { font-family: 'DM Sans', sans-serif; }
+        body { min-height: 100vh; background: #f0f2f5; }
+        .dashboard-wrapper { display: flex; min-height: 100vh; }
+        .dashboard-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--sidebar-bg) 0%, #002d14 100%);
+            color: rgba(255,255,255,0.9);
+            flex-shrink: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            padding: 1.5rem 0;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+        }
+        .dashboard-sidebar .brand {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1rem;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: white;
+        }
+        .dashboard-sidebar .nav-link {
+            color: rgba(255,255,255,0.75);
+            padding: 0.75rem 1.5rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .dashboard-sidebar .nav-link:hover { color: white; background: rgba(255,255,255,0.06); }
+        .dashboard-sidebar .nav-link.active {
+            color: white;
+            border-left-color: var(--algeria-red);
+            background: rgba(210,16,52,0.12);
+        }
+        .dashboard-sidebar .nav-link i { width: 1.4rem; margin-right: 0.6rem; opacity: 0.9; }
+        .dashboard-main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .dashboard-header h1 { font-size: 1.75rem; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.08); }
+        .stat-card .stat-value { font-size: 2rem; font-weight: 700; color: #1a1a2e; }
+        .stat-card .stat-label { color: #6c757d; font-size: 0.9rem; margin-top: 0.25rem; }
+        .stat-card .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; color: white;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+        }
+        .chart-card h5 { font-weight: 600; color: #1a1a2e; margin-bottom: 1.25rem; }
+        .btn-dashboard-logout {
+            background: rgba(210,16,52,0.2);
+            color: #d21034;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .btn-dashboard-logout:hover { background: var(--algeria-red); color: white; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="dashboard-sidebar">
+            <div class="brand"><i class="fas fa-chart-line me-2"></i>Predictor Admin</div>
+            <nav>
+                <a class="nav-link active" href="{% url 'predictor:dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'predictor:home' %}" target="_blank"><i class="fas fa-external-link-alt"></i> View site</a>
+                <a class="nav-link" href="{% url 'predictor:dashboard_logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </aside>
+        <main class="dashboard-main">
+            <div class="dashboard-header">
+                <h1>{% block page_heading %}Dashboard{% endblock %}</h1>
+                <a href="{% url 'predictor:dashboard_logout' %}" class="btn btn-dashboard-logout"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+            </div>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

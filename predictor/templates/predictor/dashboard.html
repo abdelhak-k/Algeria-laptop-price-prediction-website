@@ -1,0 +1,186 @@
+{% extends 'predictor/dashboard_base.html' %}
+{% block title %}Overview{% endblock %}
+{% block page_heading %}Overview{% endblock %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_predictions }}</div>
+                    <div class="stat-label">Total predictions</div>
+                </div>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #006233, #00843d);"><i class="fas fa-calculator"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ with_feedback }}</div>
+                    <div class="stat-label">With user feedback</div>
+                </div>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #0d6efd, #0a58ca);"><i class="fas fa-comments"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ accuracy_yes }}/{{ accuracy_close }}/{{ accuracy_no }}</div>
+                    <div class="stat-label">Accurate / Close / Not accurate</div>
+                </div>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #d21034, #a00d28);"><i class="fas fa-bullseye"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ avg_predicted|floatformat:0 }}</div>
+                    <div class="stat-label">Avg. predicted price (DZD)</div>
+                </div>
+                <div class="stat-icon" style="background: linear-gradient(135deg, #6f42c1, #5a32a3);"><i class="fas fa-coins"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="chart-card">
+            <h5><i class="fas fa-chart-area text-primary me-2"></i>Predictions over the last 14 days</h5>
+            <canvas id="chartDaily" height="120"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="chart-card">
+            <h5><i class="fas fa-chart-pie text-primary me-2"></i>Accuracy feedback</h5>
+            <canvas id="chartAccuracy" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="chart-card">
+            <h5><i class="fas fa-laptop text-primary me-2"></i>Top brands</h5>
+            <canvas id="chartBrands" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="chart-card">
+            <h5><i class="fas fa-tag text-primary me-2"></i>Condition distribution</h5>
+            <canvas id="chartCondition" height="220"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    const green = '#006233';
+    const greenLight = '#00843d';
+    const red = '#d21034';
+    const colors = [green, greenLight, '#0d6efd', '#6f42c1', '#fd7e14', '#20c997', '#e83e8c', '#6c757d'];
+
+    // Daily predictions (line/bar)
+    const dailyCtx = document.getElementById('chartDaily').getContext('2d');
+    const dailyData = {{ daily_stats_json|safe }};
+    const dailyLabels = dailyData.map(d => {
+        const date = new Date(d.date);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+    const dailyCounts = dailyData.map(d => d.count);
+    new Chart(dailyCtx, {
+        type: 'bar',
+        data: {
+            labels: dailyLabels,
+            datasets: [{
+                label: 'Predictions',
+                data: dailyCounts,
+                backgroundColor: green + '99',
+                borderColor: green,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+
+    // Accuracy (doughnut)
+    const accCtx = document.getElementById('chartAccuracy').getContext('2d');
+    new Chart(accCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Accurate', 'Close', 'Not accurate'],
+            datasets: [{
+                data: [{{ accuracy_yes }}, {{ accuracy_close }}, {{ accuracy_no }}],
+                backgroundColor: [green, '#ffc107', red],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    // Brands (horizontal bar)
+    const brandsCtx = document.getElementById('chartBrands').getContext('2d');
+    new Chart(brandsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ brands_labels_json|safe }},
+            datasets: [{
+                label: 'Predictions',
+                data: {{ brands_data_json|safe }},
+                backgroundColor: colors.slice(0, {{ brands_count }}),
+                borderWidth: 0
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+
+    // Condition (doughnut)
+    const condCtx = document.getElementById('chartCondition').getContext('2d');
+    new Chart(condCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ condition_labels_json|safe }},
+            datasets: [{
+                data: {{ condition_data_json|safe }},
+                backgroundColor: colors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { position: 'right' } }
+        }
+    });
+})();
+</script>
+{% endblock %}

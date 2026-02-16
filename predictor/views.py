@@ -1,9 +1,21 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.views import LoginView
+from django.db.models import Count, Avg, Q
+from django.utils import timezone
+from datetime import timedelta
+import json
+
 from .forms import LaptopSpecsForm, PredictionFeedbackForm
 from .model_utils import predict_price
 from .models import PredictionFeedback
+
+
+def _is_staff(user):
+    return user.is_authenticated and user.is_staff
 
 
 def home(request):
@@ -130,3 +142,78 @@ def predict_api(request):
         'success': False,
         'error': 'POST method required'
     })
+
+
+# ---------- Custom Admin Dashboard ----------
+
+@login_required(login_url='/dashboard/login/')
+@user_passes_test(_is_staff, login_url='/dashboard/login/')
+def dashboard(request):
+    """Custom admin dashboard with charts and statistics."""
+    qs = PredictionFeedback.objects.all()
+
+    # Stats cards
+    total_predictions = qs.count()
+    with_feedback = qs.filter(
+        Q(is_accurate__in=['yes', 'close', 'no']) |
+        Q(actual_price__isnull=False) |
+        ~Q(feedback_text='')
+    ).distinct().count()
+
+    accuracy_yes = qs.filter(is_accurate='yes').count()
+    accuracy_close = qs.filter(is_accurate='close').count()
+    accuracy_no = qs.filter(is_accurate='no').count()
+
+    avg_predicted = qs.aggregate(avg=Avg('predicted_price'))['avg'] or 0
+
+    # Predictions over last 14 days (for chart)
+    daily = []
+    for i in range(13, -1, -1):
+        day = timezone.now().date() - timedelta(days=i)
+        count = qs.filter(created_at__date=day).count()
+        daily.append({'date': day.isoformat(), 'count': count})
+
+    # Top brands (top 8)
+    brand_counts = list(
+        qs.values('brand').annotate(count=Count('id')).order_by('-count')[:8]
+    )
+    brands_labels = [b['brand'] for b in brand_counts]
+    brands_data = [b['count'] for b in brand_counts]
+
+    # Condition distribution
+    condition_counts = list(
+        qs.values('condition').annotate(count=Count('id')).order_by('-count')
+    )
+    condition_labels = [c['condition'] for c in condition_counts]
+    condition_data = [c['count'] for c in condition_counts]
+
+    context = {
+        'total_predictions': total_predictions,
+        'with_feedback': with_feedback,
+        'accuracy_yes': accuracy_yes,
+        'accuracy_close': accuracy_close,
+        'accuracy_no': accuracy_no,
+        'avg_predicted': round(float(avg_predicted), 0),
+        'daily_stats_json': json.dumps(daily),
+        'brands_labels_json': json.dumps(brands_labels),
+        'brands_data_json': json.dumps(brands_data),
+        'brands_count': len(brands_labels),
+        'condition_labels_json': json.dumps(condition_labels),
+        'condition_data_json': json.dumps(condition_data),
+    }
+    return render(request, 'predictor/dashboard.html', context)
+
+
+class DashboardLoginView(LoginView):
+    """Login view for dashboard; redirects to /dashboard/ after success."""
+    template_name = 'predictor/dashboard_login.html'
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return '/dashboard/'
+
+
+def dashboard_logout(request):
+    """Log out and redirect to dashboard login."""
+    logout(request)
+    return redirect('predictor:dashboard_login')
