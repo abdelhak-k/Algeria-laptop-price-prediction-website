@@ -1,0 +1,90 @@
+{% extends 'predictor/base.html' %}
+{% load static %}
+{% block title %}Compare Laptops{% endblock %}
+{% block content %}
+<style>
+    .compare-form-card .compare-col { min-width: 0; }
+    .compare-form-card .form-control, .compare-form-card .form-select { font-size: 0.9rem; }
+    .compare-form-card th { font-size: 0.85rem; color: var(--primary-color); }
+    .compare-form-card .lap-header { background: linear-gradient(135deg, var(--algeria-green), var(--algeria-green-light)); color: white; font-weight: 600; padding: 0.75rem; border-radius: 12px 12px 0 0; text-align: center; }
+    .compare-form-card .lap-header.lap2 { background: linear-gradient(135deg, #0d6efd, #0a58ca); }
+    .compare-form-card .lap-header.lap3 { background: linear-gradient(135deg, #6f42c1, #5a32a3); }
+</style>
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card compare-form-card">
+            <div class="card-header text-center">
+                <h2><i class="fas fa-balance-scale me-2"></i>Compare Laptops</h2>
+                <p class="mb-0 mt-2 opacity-75">Enter specs for 2 or 3 laptops to get predicted prices and see which wins on each feature.</p>
+                <div class="mt-3 d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="?num=2" class="btn btn-sm {% if num_laptops == 2 %}btn-light{% else %}btn-outline-light{% endif %}">Compare 2</a>
+                    <a href="?num=3" class="btn btn-sm {% if num_laptops == 3 %}btn-light{% else %}btn-outline-light{% endif %}">Compare 3</a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" action="{% url 'predictor:compare' %}" id="compare-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="num_laptops" value="{{ num_laptops }}">
+                    <div class="row g-4">
+                        {% for form in forms %}
+                        <div class="compare-col col-md-{% if num_laptops == 2 %}6{% else %}4{% endif %}">
+                            <div class="lap-header {% if forloop.counter == 1 %}lap1{% elif forloop.counter == 2 %}lap2{% else %}lap3{% endif %}">Laptop {{ forloop.counter }}</div>
+                            <div class="form-section p-3">
+                                <div class="row g-2">
+                                    <div class="col-12"><label class="form-label small">Brand</label>{{ form.brand }}</div>
+                                    <div class="col-12"><label class="form-label small">Series</label>{{ form.series }}</div>
+                                    <div class="col-12"><label class="form-label small">Condition</label>{{ form.condition }}</div>
+                                    <div class="col-12"><label class="form-label small">Listing Year</label>{{ form.listing_year }}</div>
+                                </div>
+                                <h6 class="mt-3 mb-2 text-primary small">CPU</h6>
+                                <div class="row g-2">
+                                    <div class="col-12"><label class="form-label small">CPU Brand</label>{{ form.cpu_brand }}</div>
+                                    <div class="col-12"><label class="form-label small">CPU Family</label>{{ form.cpu_family }}</div>
+                                    <div class="col-6"><label class="form-label small">Gen</label>{{ form.cpu_generation }}</div>
+                                    <div class="col-6"><label class="form-label small">Suffix</label>{{ form.cpu_suffix }}</div>
+                                    <div class="col-12"><div class="form-check">{{ form.is_pro }}<label class="form-check-label small">Pro/Business CPU</label></div></div>
+                                </div>
+                                <h6 class="mt-3 mb-2 text-primary small">GPU</h6>
+                                <div class="row g-2">
+                                    <div class="col-12"><label class="form-label small">GPU</label>{{ form.gpu_tier }}</div>
+                                    <div class="col-12"><label class="form-label small">GPU Suffix</label>{{ form.gpu_suffix }}</div>
+                                </div>
+                                <h6 class="mt-3 mb-2 text-primary small">Memory & Storage</h6>
+                                <div class="row g-2">
+                                    <div class="col-6"><label class="form-label small">RAM (GB)</label>{{ form.ram_size_gb }}</div>
+                                    <div class="col-6"><label class="form-label small">RAM Type</label>{{ form.ram_type_class }}</div>
+                                    <div class="col-6"><label class="form-label small">SSD (GB)</label>{{ form.ssd_size_gb }}</div>
+                                    <div class="col-6"><label class="form-label small">HDD (GB)</label>{{ form.hdd_size_gb }}</div>
+                                </div>
+                                <h6 class="mt-3 mb-2 text-primary small">Display</h6>
+                                <div class="row g-2">
+                                    <div class="col-6"><label class="form-label small">Screen</label>{{ form.screen_size }}</div>
+                                    <div class="col-6"><label class="form-label small">Resolution</label>{{ form.resolution_class }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-predict">
+                            <i class="fas fa-balance-scale me-2"></i>Compare & predict prices
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'predictor/js/laptop-form-dropdowns.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var prefixes = {{ prefixes_json|safe }};
+    prefixes.forEach(function(prefix) {
+        initLaptopFormDropdowns(prefix);
+    });
+});
+</script>
+{% endblock %}

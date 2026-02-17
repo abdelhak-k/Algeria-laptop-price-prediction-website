@@ -10,7 +10,7 @@ from datetime import timedelta
 import json
 
 from .forms import LaptopSpecsForm, PredictionFeedbackForm
-from .model_utils import predict_price
+from .model_utils import predict_price, SERIES_TIER_MAP
 from .models import PredictionFeedback
 
 
@@ -141,6 +141,124 @@ def predict_api(request):
     return JsonResponse({
         'success': False,
         'error': 'POST method required'
+    })
+
+
+# ---------- Compare Laptops ----------
+
+def _get_segment_tier(specs):
+    """Segment (1=Budget, 2=Consumer, 3=Business, 4=Premium, 5=Flagship). Matches model_utils logic."""
+    series = (specs.get('series') or '').strip().upper()
+    brand = (specs.get('brand') or '').strip().upper()
+    tier = SERIES_TIER_MAP.get(series, 2)
+    if brand == 'APPLE' and tier < 4:
+        tier = 4
+    return tier
+
+
+def _build_compare_row(feature_name, display_values, winner_from_values=None, lower_better=False, higher_better=False):
+    """Build a comparison row. Only set winner when one value is strictly best (no tie)."""
+    compare_vals = winner_from_values if winner_from_values is not None else display_values
+    winner_idx = None
+    if lower_better and compare_vals and all(v is not None for v in compare_vals):
+        try:
+            numeric = [float(v) if isinstance(v, (int, float)) else float(str(v).replace(',', '').replace(' ', '')) for v in compare_vals]
+            min_val = min(numeric)
+            min_indices = [i for i, n in enumerate(numeric) if n == min_val]
+            if len(min_indices) == 1:
+                winner_idx = min_indices[0]
+        except (ValueError, TypeError):
+            pass
+    if higher_better and compare_vals and all(v is not None for v in compare_vals):
+        try:
+            numeric = [float(v) if isinstance(v, (int, float)) else float(str(v).replace(',', '').replace(' ', '')) for v in compare_vals]
+            max_val = max(numeric)
+            max_indices = [i for i, n in enumerate(numeric) if n == max_val]
+            if len(max_indices) == 1:
+                winner_idx = max_indices[0]
+        except (ValueError, TypeError):
+            pass
+    return {'feature': feature_name, 'values': display_values, 'winner_idx': winner_idx}
+
+
+def compare(request):
+    """Compare 2 or 3 laptops: form (GET) or run predictions and show comparison (POST)."""
+    num_laptops = 2
+    if request.method == 'POST':
+        num_laptops = int(request.POST.get('num_laptops', 2))
+    else:
+        try:
+            num_laptops = int(request.GET.get('num', 2))
+        except (ValueError, TypeError):
+            num_laptops = 2
+    if num_laptops not in (2, 3):
+        num_laptops = 2
+
+    prefixes = ['lap1', 'lap2', 'lap3'][:num_laptops]
+    forms = [LaptopSpecsForm(prefix=p) for p in prefixes]
+
+    if request.method == 'POST':
+        for i, p in enumerate(prefixes):
+            forms[i] = LaptopSpecsForm(request.POST, prefix=p)
+        all_valid = all(f.is_valid() for f in forms)
+        if all_valid:
+            results = []
+            for f in forms:
+                result = predict_price(f.cleaned_data)
+                results.append({
+                    'specs': f.cleaned_data,
+                    'prediction': result,
+                })
+            # Build comparison rows for the result table
+            rows = []
+            # Specs (display only or with winner)
+            for idx, label in enumerate(['Brand', 'Series', 'Condition']):
+                key = ['brand', 'series', 'condition'][idx]
+                vals = [r['specs'].get(key, '—') for r in results]
+                rows.append(_build_compare_row(label, vals))
+
+            cpu_labels = [f"{r['specs'].get('cpu_brand', '')} {r['specs'].get('cpu_family', '')} Gen {r['specs'].get('cpu_generation', '0')} {r['specs'].get('cpu_suffix', '') or ''}".strip() for r in results]
+            rows.append(_build_compare_row('CPU', cpu_labels))
+            gpu_labels = [f"{r['specs'].get('gpu_tier', '')} {r['specs'].get('gpu_suffix', '') or ''}".strip() or 'Integrated' for r in results]
+            rows.append(_build_compare_row('GPU', gpu_labels))
+
+            ram_vals = [r['specs'].get('ram_size_gb') for r in results]
+            rows.append(_build_compare_row('RAM (GB)', ram_vals, higher_better=True))
+            ssd_vals = [r['specs'].get('ssd_size_gb') for r in results]
+            rows.append(_build_compare_row('SSD (GB)', ssd_vals, higher_better=True))
+            hdd_vals = [r['specs'].get('hdd_size_gb') for r in results]
+            rows.append(_build_compare_row('HDD (GB)', hdd_vals, higher_better=True))
+            screen_vals = [r['specs'].get('screen_size') for r in results]
+            rows.append(_build_compare_row('Screen (")', screen_vals, higher_better=True))
+            res_vals = [r['specs'].get('resolution_class', '—') for r in results]
+            rows.append(_build_compare_row('Resolution', res_vals))
+
+            # Price winner only when all laptops are in the same segment (tier)
+            tiers = [_get_segment_tier(r['specs']) for r in results]
+            same_segment = len(set(tiers)) == 1
+
+            pred_prices = [r['prediction'].get('predicted_price') if r['prediction'].get('success') else None for r in results]
+            pred_labels = [f"{p:,.0f} DZD" if p is not None else "—" for p in pred_prices]
+            rows.append(_build_compare_row('Predicted price', pred_labels, winner_from_values=pred_prices, lower_better=same_segment))
+
+            min_prices = [r['prediction'].get('min_price') if r['prediction'].get('success') else None for r in results]
+            min_labels = [f"{p:,.0f} DZD" if p is not None else "—" for p in min_prices]
+            rows.append(_build_compare_row('Price range (min)', min_labels, winner_from_values=min_prices, lower_better=same_segment))
+            max_prices = [r['prediction'].get('max_price') if r['prediction'].get('success') else None for r in results]
+            max_labels = [f"{p:,.0f} DZD" if p is not None else "—" for p in max_prices]
+            rows.append(_build_compare_row('Price range (max)', max_labels, winner_from_values=max_prices, lower_better=same_segment))
+
+            return render(request, 'predictor/compare_result.html', {
+                'results': results,
+                'num_laptops': num_laptops,
+                'rows': rows,
+            })
+        # re-render form with errors
+    return render(request, 'predictor/compare.html', {
+        'forms': forms,
+        'prefixes': prefixes,
+        'prefixes_json': json.dumps(prefixes),
+        'num_laptops': num_laptops,
     })
 
 

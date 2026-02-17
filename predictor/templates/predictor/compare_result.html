@@ -1,0 +1,54 @@
+{% extends 'predictor/base.html' %}
+{% block title %}Comparison results{% endblock %}
+{% block content %}
+<style>
+    .compare-result-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
+    .compare-result-card .table th { background: #f8f9fa; color: var(--primary-color); font-weight: 600; }
+    .compare-result-card .table td.winner { background: rgba(0, 98, 51, 0.12); font-weight: 600; color: #006233; }
+    .compare-result-card .table td.winner.lap2 { background: rgba(13, 110, 253, 0.12); color: #0d6efd; }
+    .compare-result-card .table td.winner.lap3 { background: rgba(111, 66, 193, 0.12); color: #6f42c1; }
+    .compare-price-row { font-size: 1.1rem; }
+    .compare-price-row .winner { font-size: 1.2rem; }
+</style>
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card compare-result-card">
+            <div class="card-header text-center">
+                <h2><i class="fas fa-balance-scale me-2"></i>Comparison results</h2>
+                <p class="mb-0 mt-2 opacity-75">Predicted prices and feature comparison. <span class="badge bg-success">Green</span> = best in that row.</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 22%;">Feature</th>
+                                <th style="width: 26%;">Laptop 1</th>
+                                {% if num_laptops >= 2 %}<th style="width: 26%;">Laptop 2</th>{% endif %}
+                                {% if num_laptops >= 3 %}<th style="width: 26%;">Laptop 3</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in rows %}
+                            <tr class="{% if 'price' in row.feature|lower or 'Price' in row.feature %}compare-price-row{% endif %}">
+                                <th scope="row">{{ row.feature }}</th>
+                                {% for val in row.values %}
+                                <td class="{% if row.winner_idx == forloop.counter0 %}winner lap{{ forloop.counter }}{% endif %}">
+                                    {{ val|default:"—" }}
+                                    {% if row.winner_idx == forloop.counter0 %}<i class="fas fa-trophy ms-1 text-warning" title="Best in this category"></i>{% endif %}
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 d-flex justify-content-between flex-wrap gap-2">
+                    <a href="{% url 'predictor:compare' %}?num={{ num_laptops }}" class="btn btn-outline-primary"><i class="fas fa-redo me-1"></i>Compare again</a>
+                    <a href="{% url 'predictor:home' %}" class="btn btn-outline-secondary"><i class="fas fa-calculator me-1"></i>Single prediction</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

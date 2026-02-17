@@ -365,6 +365,10 @@
             <h1>
                 Algerian <span class="algeria-star">🇩🇿</span> Laptop Price Predictor
             </h1>
+            <p class="mt-2 mb-0">
+                <a href="{% url 'predictor:home' %}" class="btn btn-sm btn-outline-light me-2">Predict price</a>
+                <a href="{% url 'predictor:compare' %}" class="btn btn-sm btn-outline-light"><i class="fas fa-balance-scale me-1"></i>Compare 2 or 3 laptops</a>
+            </p>
         </div>
         
         {% block content %}{% endblock %}

@@ -289,11 +289,11 @@ class LaptopSpecsForm(forms.Form):
     # Basic Info
     brand = forms.ChoiceField(
         choices=BRAND_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select', 'id': 'id_brand'})
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     series = forms.ChoiceField(
         choices=SERIES_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select', 'id': 'id_series'})
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     condition = forms.ChoiceField(
         choices=CONDITION_CHOICES,
@@ -303,16 +303,16 @@ class LaptopSpecsForm(forms.Form):
     # CPU Specifications
     cpu_brand = forms.ChoiceField(
         choices=CPU_BRAND_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select', 'id': 'id_cpu_brand'})
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     cpu_family = forms.ChoiceField(
         choices=CPU_FAMILY_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select', 'id': 'id_cpu_family'})
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     cpu_generation = forms.ChoiceField(
         choices=GENERATION_CHOICES,
         required=False,
-        widget=forms.Select(attrs={'class': 'form-select', 'id': 'id_cpu_generation'})
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     cpu_suffix = forms.ChoiceField(
         choices=CPU_SUFFIX_CHOICES,
