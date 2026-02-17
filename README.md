@@ -2,6 +2,8 @@
 
 A Django web application that predicts laptop prices in the Algerian market using machine learning.
 
+**License:** [MIT](LICENSE) — feel free to use this project; we ask that you keep the copyright and license notice.
+
 The website is working and is deployed on: https://laptopdz.leapcell.app/
 ## Overview
 
@@ -66,11 +68,11 @@ https://www.kaggle.com/datasets/kadouciabdelhak/algeria-laptop-price-prediction-
 
 ## License
 
-This project is developed for educational purposes.
+This project is developed for educational purposes, by: CHERDOUH Yassir, KADOUCI Abdelhak, GUENDOUZ Ahmed Fateh, SOUACI Abdennour.
 
 ## Requirements
 
-See `requirements.txt` for detailed package versions. Main dependencies:
+See `requirements.txt` for detailed package versions.
 
 ## Notes
 
