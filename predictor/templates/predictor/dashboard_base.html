@@ -105,7 +105,8 @@
         <aside class="dashboard-sidebar">
             <div class="brand"><i class="fas fa-chart-line me-2"></i>Predictor Admin</div>
             <nav>
-                <a class="nav-link active" href="{% url 'predictor:dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'predictor:dashboard' %}"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard_feedback' %}active{% endif %}" href="{% url 'predictor:dashboard_feedback' %}"><i class="fas fa-comments"></i> User feedbacks</a>
                 <a class="nav-link" href="{% url 'predictor:home' %}" target="_blank"><i class="fas fa-external-link-alt"></i> View site</a>
                 <a class="nav-link" href="{% url 'predictor:dashboard_logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>

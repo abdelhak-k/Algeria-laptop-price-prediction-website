@@ -204,6 +204,32 @@ def dashboard(request):
     return render(request, 'predictor/dashboard.html', context)
 
 
+@login_required(login_url='/dashboard/login/')
+@user_passes_test(_is_staff, login_url='/dashboard/login/')
+def dashboard_feedback(request):
+    """List all user feedbacks with optional filter and pagination."""
+    from django.core.paginator import Paginator
+
+    qs = PredictionFeedback.objects.all().order_by('-created_at')
+    filter_with_feedback = request.GET.get('with_feedback', '')
+    if filter_with_feedback == '1':
+        qs = qs.filter(
+            Q(is_accurate__in=['yes', 'close', 'no']) |
+            Q(actual_price__isnull=False) |
+            ~Q(feedback_text='')
+        ).distinct()
+
+    paginator = Paginator(qs, 20)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'filter_with_feedback': filter_with_feedback,
+    }
+    return render(request, 'predictor/dashboard_feedback.html', context)
+
+
 class DashboardLoginView(LoginView):
     """Login view for dashboard; redirects to /dashboard/ after success."""
     template_name = 'predictor/dashboard_login.html'

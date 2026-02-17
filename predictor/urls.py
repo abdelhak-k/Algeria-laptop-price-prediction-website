@@ -9,6 +9,7 @@ urlpatterns = [
     path('submit-feedback/', views.submit_feedback, name='submit_feedback'),
     # Custom admin dashboard (staff only)
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/feedback/', views.dashboard_feedback, name='dashboard_feedback'),
     path('dashboard/login/', views.DashboardLoginView.as_view(), name='dashboard_login'),
     path('dashboard/logout/', views.dashboard_logout, name='dashboard_logout'),
 ]
