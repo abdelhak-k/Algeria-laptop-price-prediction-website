@@ -708,3 +708,154 @@ def predict_price(form_data):
             'success': False,
             'error': f"Prediction error: {str(e)}"
         }
+
+
+# ============================================================================
+# LAPTOP SUGGESTION TEMPLATES
+# ============================================================================
+
+# A diverse set of realistic laptop configurations across price tiers
+LAPTOP_TEMPLATES = [
+    # ---- Budget tier ----
+    {'brand': 'LENOVO', 'series': 'IDEAPAD', 'cpu_brand': 'INTEL', 'cpu_family': 'celeron', 'cpu_generation': '0', 'cpu_suffix': '', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 4, 'ram_type_class': 'DDR4', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'HD', 'label': 'Lenovo IdeaPad – Celeron / 4 GB / 256 SSD'},
+    {'brand': 'HP', 'series': 'PAVILION', 'cpu_brand': 'INTEL', 'cpu_family': 'pentium', 'cpu_generation': '0', 'cpu_suffix': '', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 4, 'ram_type_class': 'DDR4', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'HD', 'label': 'HP Pavilion – Pentium / 4 GB / 256 SSD'},
+    {'brand': 'ACER', 'series': 'ASPIRE', 'cpu_brand': 'INTEL', 'cpu_family': 'i3', 'cpu_generation': '10', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 4, 'ram_type_class': 'DDR4', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'HD', 'label': 'Acer Aspire – i3-10th / 4 GB / 256 SSD'},
+    {'brand': 'LENOVO', 'series': 'IDEAPAD', 'cpu_brand': 'INTEL', 'cpu_family': 'i3', 'cpu_generation': '11', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Lenovo IdeaPad – i3-11th / 8 GB / 256 SSD'},
+    {'brand': 'HP', 'series': 'PAVILION', 'cpu_brand': 'AMD', 'cpu_family': 'r3', 'cpu_generation': '5', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'HP Pavilion – Ryzen 3 5th / 8 GB / 256 SSD'},
+    {'brand': 'DELL', 'series': 'INSPIRON', 'cpu_brand': 'INTEL', 'cpu_family': 'i3', 'cpu_generation': '12', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Dell Inspiron – i3-12th / 8 GB / 256 SSD'},
+    {'brand': 'ASUS', 'series': 'VIVOBOOK', 'cpu_brand': 'INTEL', 'cpu_family': 'i3', 'cpu_generation': '12', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Asus VivoBook – i3-12th / 8 GB / 512 SSD'},
+
+    # ---- Mid-range tier ----
+    {'brand': 'LENOVO', 'series': 'IDEAPAD', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '11', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Lenovo IdeaPad – i5-11th H / 8 GB / 256 SSD'},
+    {'brand': 'HP', 'series': 'PAVILION', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '12', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'HP Pavilion – i5-12th / 8 GB / 512 SSD'},
+    {'brand': 'DELL', 'series': 'INSPIRON', 'cpu_brand': 'AMD', 'cpu_family': 'r5', 'cpu_generation': '5', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Dell Inspiron – Ryzen 5 5th / 8 GB / 512 SSD'},
+    {'brand': 'ASUS', 'series': 'VIVOBOOK', 'cpu_brand': 'AMD', 'cpu_family': 'r5', 'cpu_generation': '6', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Asus VivoBook – Ryzen 5 6th / 8 GB / 512 SSD'},
+    {'brand': 'ACER', 'series': 'ASPIRE', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '12', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Acer Aspire – i5-12th H / 16 GB / 512 SSD'},
+    {'brand': 'LENOVO', 'series': 'IDEAPAD', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Lenovo IdeaPad – i5-13th / 16 GB DDR5 / 512 SSD'},
+    {'brand': 'HP', 'series': 'PROBOOK', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': True, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD', 'label': 'HP ProBook – i5-13th Pro / 16 GB / 512 SSD'},
+    {'brand': 'DELL', 'series': 'VOSTRO', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD', 'label': 'Dell Vostro – i5-13th / 8 GB / 512 SSD'},
+
+    # ---- Mid-range with GPU ----
+    {'brand': 'LENOVO', 'series': 'IDEAPAD', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '12', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'MX', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Lenovo IdeaPad – i5-12th H / 8 GB / MX GPU'},
+    {'brand': 'ACER', 'series': 'ASPIRE', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '13', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'GTX 1650', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Acer Aspire – i5-13th H / 8 GB / GTX 1650'},
+
+    # ---- Gaming / Performance tier ----
+    {'brand': 'LENOVO', 'series': 'LEGION', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '12', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 3050', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Lenovo Legion – i5-12th / 16 GB / RTX 3050'},
+    {'brand': 'HP', 'series': 'VICTUS', 'cpu_brand': 'AMD', 'cpu_family': 'r5', 'cpu_generation': '6', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 3050', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'HP Victus – Ryzen 5 6th H / 16 GB / RTX 3050'},
+    {'brand': 'ACER', 'series': 'NITRO', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '12', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 3060', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Acer Nitro – i5-12th / 16 GB / RTX 3060'},
+    {'brand': 'ASUS', 'series': 'TUF', 'cpu_brand': 'AMD', 'cpu_family': 'r7', 'cpu_generation': '6', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 3060', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Asus TUF – Ryzen 7 6th H / 16 GB / RTX 3060'},
+    {'brand': 'MSI', 'series': 'KATANA', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '13', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 4050', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'MSI Katana – i5-13th / 16 GB / RTX 4050'},
+    {'brand': 'DELL', 'series': 'G SERIES', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '12', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 3060', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Dell G Series – i7-12th H / 16 GB / RTX 3060'},
+    {'brand': 'LENOVO', 'series': 'LEGION', 'cpu_brand': 'AMD', 'cpu_family': 'r7', 'cpu_generation': '7', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 4060', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 16.0, 'resolution_class': 'FHD+ / WUXGA', 'label': 'Lenovo Legion – Ryzen 7 7th / 16 GB / RTX 4060'},
+    {'brand': 'ASUS', 'series': 'ROG', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 4060', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 16.0, 'resolution_class': 'QHD / 2K', 'label': 'Asus ROG – i7-13th H / 16 GB / RTX 4060 / 1 TB'},
+    {'brand': 'HP', 'series': 'OMEN', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 4070', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 16.1, 'resolution_class': 'QHD / 2K', 'label': 'HP Omen – i7-13th H / 16 GB / RTX 4070 / 1 TB'},
+
+    # ---- Business / Premium tier ----
+    {'brand': 'LENOVO', 'series': 'THINKPAD', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '12', 'cpu_suffix': 'U', 'is_pro': True, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD', 'label': 'Lenovo ThinkPad – i5-12th Pro / 8 GB / 256 SSD'},
+    {'brand': 'LENOVO', 'series': 'THINKPAD', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': True, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD', 'label': 'Lenovo ThinkPad – i5-13th Pro / 16 GB / 512 SSD'},
+    {'brand': 'HP', 'series': 'ELITEBOOK', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': True, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD', 'label': 'HP EliteBook – i5-13th Pro / 16 GB / 512 SSD'},
+    {'brand': 'DELL', 'series': 'LATITUDE', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': True, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD', 'label': 'Dell Latitude – i7-13th Pro / 16 GB / 512 SSD'},
+    {'brand': 'LENOVO', 'series': 'YOGA', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD+ / WUXGA', 'label': 'Lenovo Yoga – i7-13th / 16 GB / 512 SSD'},
+    {'brand': 'ASUS', 'series': 'ZENBOOK', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'LPDDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD+ / WUXGA', 'label': 'Asus ZenBook – i7-13th / 16 GB LPDDR5 / 512 SSD'},
+
+    # ---- High-end / Flagship tier ----
+    {'brand': 'DELL', 'series': 'XPS', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'LPDDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD+ / WUXGA', 'label': 'Dell XPS – i7-13th H / 16 GB LPDDR5 / 512 SSD'},
+    {'brand': 'HP', 'series': 'SPECTRE', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'LPDDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'QHD+ / 3K', 'label': 'HP Spectre – i7-13th / 16 GB / 1 TB SSD'},
+    {'brand': 'LENOVO', 'series': 'LEGION', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'HX', 'is_pro': False, 'gpu_tier': 'RTX 4070', 'gpu_suffix': '', 'ram_size_gb': 32, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 16.0, 'resolution_class': 'QHD+ / 3K', 'label': 'Lenovo Legion – i7-13th HX / 32 GB / RTX 4070 / 1 TB'},
+    {'brand': 'ASUS', 'series': 'ROG', 'cpu_brand': 'INTEL', 'cpu_family': 'i9', 'cpu_generation': '13', 'cpu_suffix': 'HX', 'is_pro': False, 'gpu_tier': 'RTX 4080', 'gpu_suffix': '', 'ram_size_gb': 32, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 16.0, 'resolution_class': 'QHD / 2K', 'label': 'Asus ROG – i9-13th HX / 32 GB / RTX 4080 / 1 TB'},
+    {'brand': 'MSI', 'series': 'RAIDER', 'cpu_brand': 'INTEL', 'cpu_family': 'i9', 'cpu_generation': '13', 'cpu_suffix': 'HX', 'is_pro': False, 'gpu_tier': 'RTX 4090', 'gpu_suffix': '', 'ram_size_gb': 32, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 17.3, 'resolution_class': 'QHD / 2K', 'label': 'MSI Raider – i9-13th HX / 32 GB / RTX 4090 / 1 TB'},
+    {'brand': 'DELL', 'series': 'ALIENWARE', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'HX', 'is_pro': False, 'gpu_tier': 'RTX 4070', 'gpu_suffix': '', 'ram_size_gb': 32, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 17.3, 'resolution_class': 'QHD / 2K', 'label': 'Dell Alienware – i7-13th HX / 32 GB / RTX 4070 / 1 TB'},
+
+    # ---- Apple tier ----
+    {'brand': 'APPLE', 'series': 'MACBOOK AIR', 'cpu_brand': 'APPLE', 'cpu_family': 'm1', 'cpu_generation': '0', 'cpu_suffix': '', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'LPDDR4x', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 13.3, 'resolution_class': 'QHD+ / 3K', 'label': 'MacBook Air M1 / 8 GB / 256 SSD'},
+    {'brand': 'APPLE', 'series': 'MACBOOK AIR', 'cpu_brand': 'APPLE', 'cpu_family': 'm2', 'cpu_generation': '0', 'cpu_suffix': '', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'LPDDR5', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 13.6, 'resolution_class': 'QHD+ / 3K', 'label': 'MacBook Air M2 / 8 GB / 256 SSD'},
+    {'brand': 'APPLE', 'series': 'MACBOOK PRO', 'cpu_brand': 'APPLE', 'cpu_family': 'm2', 'cpu_generation': '0', 'cpu_suffix': 'PRO', 'is_pro': True, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'LPDDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.2, 'resolution_class': 'QHD+ / 3K', 'label': 'MacBook Pro M2 Pro / 16 GB / 512 SSD'},
+    {'brand': 'APPLE', 'series': 'MACBOOK PRO', 'cpu_brand': 'APPLE', 'cpu_family': 'm3', 'cpu_generation': '0', 'cpu_suffix': 'PRO', 'is_pro': True, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 18, 'ram_type_class': 'LPDDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.2, 'resolution_class': 'QHD+ / 3K', 'label': 'MacBook Pro M3 Pro / 18 GB / 512 SSD'},
+
+    # ---- Workstation tier ----
+    {'brand': 'DELL', 'series': 'PRECISION', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'H', 'is_pro': True, 'gpu_tier': 'RTX Workstation 2000', 'gpu_suffix': '', 'ram_size_gb': 32, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Dell Precision – i7-13th / 32 GB / RTX A2000 / 1 TB'},
+    {'brand': 'LENOVO', 'series': 'THINKPAD', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'H', 'is_pro': True, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 32, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'QHD+ / 3K', 'label': 'Lenovo ThinkPad – i7-13th Pro / 32 GB / 1 TB'},
+
+    # ---- Extra variety (different brands/configs) ----
+    {'brand': 'HUAWEI', 'series': 'MATEBOOK', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '12', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'LPDDR4x', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD+ / WUXGA', 'label': 'Huawei MateBook – i5-12th / 8 GB / 512 SSD'},
+    {'brand': 'SAMSUNG', 'series': 'GALAXY BOOK', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'LPDDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'Samsung Galaxy Book – i7-13th / 16 GB / 512 SSD'},
+    {'brand': 'ACER', 'series': 'SWIFT', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'LPDDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD+ / WUXGA', 'label': 'Acer Swift – i7-13th / 16 GB / 512 SSD'},
+    {'brand': 'MSI', 'series': 'MODERN', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR4', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'MSI Modern – i5-13th / 8 GB / 512 SSD'},
+    {'brand': 'MSI', 'series': 'STEALTH', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 4060', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'QHD / 2K', 'label': 'MSI Stealth – i7-13th H / 16 GB / RTX 4060 / 1 TB'},
+    {'brand': 'GIGABYTE', 'series': 'AORUS', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'H', 'is_pro': False, 'gpu_tier': 'RTX 4060', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'QHD / 2K', 'label': 'Gigabyte Aorus – i7-13th / 16 GB / RTX 4060 / 1 TB'},
+    {'brand': 'ACER', 'series': 'PREDATOR', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'HX', 'is_pro': False, 'gpu_tier': 'RTX 4070', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 1024, 'hdd_size_gb': 0, 'screen_size': 16.0, 'resolution_class': 'QHD / 2K', 'label': 'Acer Predator – i7-13th HX / 16 GB / RTX 4070 / 1 TB'},
+    {'brand': 'HP', 'series': 'ENVY', 'cpu_brand': 'INTEL', 'cpu_family': 'i7', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': False, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 16, 'ram_type_class': 'DDR5', 'ssd_size_gb': 512, 'hdd_size_gb': 0, 'screen_size': 15.6, 'resolution_class': 'FHD', 'label': 'HP Envy – i7-13th / 16 GB / 512 SSD'},
+    {'brand': 'ASUS', 'series': 'EXPERTBOOK', 'cpu_brand': 'INTEL', 'cpu_family': 'i5', 'cpu_generation': '13', 'cpu_suffix': 'U', 'is_pro': True, 'gpu_tier': 'NONE', 'gpu_suffix': '', 'ram_size_gb': 8, 'ram_type_class': 'DDR5', 'ssd_size_gb': 256, 'hdd_size_gb': 0, 'screen_size': 14.0, 'resolution_class': 'FHD', 'label': 'Asus ExpertBook – i5-13th Pro / 8 GB / 256 SSD'},
+]
+
+
+def generate_suggestions(min_price, max_price, condition_filter=None, listing_year=2025):
+    """
+    Generate laptop suggestions within a budget range by running the model
+    on a set of predefined realistic laptop configurations.
+
+    Returns a list of dicts sorted by predicted price, each containing
+    specs and predicted price info.
+    """
+    try:
+        model, preprocessor = load_model()
+    except FileNotFoundError as e:
+        return {'success': False, 'error': str(e), 'suggestions': []}
+
+    conditions = [condition_filter] if condition_filter else ['JAMAIS UTILISÉ', 'BON ÉTAT', 'MOYEN']
+    suggestions = []
+
+    for template in LAPTOP_TEMPLATES:
+        for cond in conditions:
+            form_data = dict(template)
+            form_data['condition'] = cond
+            form_data['listing_year'] = listing_year
+
+            try:
+                input_df, _, _ = prepare_input_data(form_data)
+                X = preprocessor.transform(input_df)
+                y_log = model.predict(X)
+                predicted_price = float(np.expm1(y_log[0]))
+                predicted_price = max(predicted_price, 10000)
+
+                model_rmse = 28000
+                pred_min = max(predicted_price - model_rmse, 5000)
+                pred_max = predicted_price + model_rmse
+
+                # Check if predicted price range overlaps with the budget range
+                if predicted_price >= min_price and predicted_price <= max_price:
+                    suggestions.append({
+                        'label': template['label'],
+                        'condition': cond,
+                        'brand': template['brand'],
+                        'series': template['series'],
+                        'cpu_family': template['cpu_family'],
+                        'cpu_generation': template['cpu_generation'],
+                        'cpu_suffix': template['cpu_suffix'],
+                        'gpu_tier': template['gpu_tier'],
+                        'gpu_suffix': template['gpu_suffix'],
+                        'ram_size_gb': template['ram_size_gb'],
+                        'ram_type_class': template['ram_type_class'],
+                        'ssd_size_gb': template['ssd_size_gb'],
+                        'hdd_size_gb': template['hdd_size_gb'],
+                        'screen_size': template['screen_size'],
+                        'resolution_class': template['resolution_class'],
+                        'is_pro': template['is_pro'],
+                        'predicted_price': round(predicted_price, 0),
+                        'predicted_price_formatted': f"{predicted_price:,.0f} DZD",
+                        'min_price': round(pred_min, 0),
+                        'max_price': round(pred_max, 0),
+                        'min_price_formatted': f"{pred_min:,.0f} DZD",
+                        'max_price_formatted': f"{pred_max:,.0f} DZD",
+                    })
+            except Exception:
+                continue  # Skip bad config
+
+    # Sort by predicted price ascending
+    suggestions.sort(key=lambda x: x['predicted_price'])
+
+    return {
+        'success': True,
+        'suggestions': suggestions,
+        'total': len(suggestions),
+    }

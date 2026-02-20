@@ -1,0 +1,123 @@
+{% extends 'predictor/base.html' %}
+{% load static %}
+
+{% block title %}Budget Laptop Suggestions – Algerian Market{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header text-center">
+                <h2><i class="fas fa-wallet me-2"></i>Budget Laptop Suggestions</h2>
+                <p class="mb-0 mt-2 opacity-75">Enter your budget range and we'll suggest laptops you can afford</p>
+            </div>
+            <div class="card-body p-4">
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                    <p class="mb-0">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'predictor:suggest' %}" id="suggest-form">
+                    {% csrf_token %}
+
+                    <div class="form-section">
+                        <div class="section-icon">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <h5 class="mb-0">Your Budget (DZD)</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Minimum Price</label>
+                                {{ form.min_price }}
+                                {% if form.min_price.errors %}
+                                <div class="text-danger small mt-1">{{ form.min_price.errors.0 }}</div>
+                                {% endif %}
+                                <small class="text-muted d-block mt-1">e.g., 30,000 DZD</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Maximum Price</label>
+                                {{ form.max_price }}
+                                {% if form.max_price.errors %}
+                                <div class="text-danger small mt-1">{{ form.max_price.errors.0 }}</div>
+                                {% endif %}
+                                <small class="text-muted d-block mt-1">e.g., 120,000 DZD</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-icon">
+                            <div class="icon-wrapper">
+                                <i class="fas fa-filter"></i>
+                            </div>
+                            <h5 class="mb-0">Preferences (Optional)</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Condition</label>
+                                {{ form.condition }}
+                                <small class="text-muted d-block mt-1">Leave as "Any" to see all conditions</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" id="suggest-submit-btn" class="btn btn-primary btn-predict" data-loading="false">
+                            <span class="btn-suggest-content">
+                                <i class="fas fa-search-dollar me-2"></i>Find Laptops
+                            </span>
+                            <span class="btn-suggest-loading d-none" aria-hidden="true">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Searching...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Quick budget presets -->
+                <div class="mt-4 text-center">
+                    <p class="text-muted small mb-2">Quick presets:</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" data-min="20000" data-max="60000">Budget (20K–60K)</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" data-min="60000" data-max="120000">Mid-range (60K–120K)</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" data-min="120000" data-max="200000">High-end (120K–200K)</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" data-min="200000" data-max="400000">Premium (200K–400K)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Presets
+    document.querySelectorAll('.preset-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.getElementById('id_min_price').value = this.dataset.min;
+            document.getElementById('id_max_price').value = this.dataset.max;
+        });
+    });
+
+    // Loading state
+    var form = document.getElementById('suggest-form');
+    var btn = document.getElementById('suggest-submit-btn');
+    if (form && btn) {
+        form.addEventListener('submit', function() {
+            if (btn.getAttribute('data-loading') === 'true') return;
+            btn.setAttribute('data-loading', 'true');
+            btn.disabled = true;
+            btn.querySelector('.btn-suggest-content').classList.add('d-none');
+            btn.querySelector('.btn-suggest-loading').classList.remove('d-none');
+        });
+    }
+});
+</script>
+{% endblock %}

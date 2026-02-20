@@ -1,0 +1,212 @@
+{% extends 'predictor/base.html' %}
+{% load static %}
+
+{% block title %}Laptop Suggestions – {{ min_price_formatted }} to {{ max_price_formatted }} DZD{% endblock %}
+
+{% block content %}
+<style>
+    .suggestion-card {
+        border: 2px solid #e9ecef;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        background: #fff;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .suggestion-card:hover {
+        border-color: var(--algeria-green);
+        box-shadow: 0 6px 24px rgba(0, 98, 51, 0.15);
+        transform: translateY(-2px);
+    }
+    .suggestion-price {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--algeria-green);
+    }
+    .suggestion-price-range {
+        font-size: 0.8rem;
+        color: var(--text-light);
+    }
+    .suggestion-label {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+    .suggestion-specs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .spec-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        background: #f0f4f0;
+        color: #333;
+    }
+    .spec-badge i {
+        margin-right: 4px;
+        font-size: 0.7rem;
+        color: var(--algeria-green);
+    }
+    .condition-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .condition-new { background: #d4edda; color: #155724; }
+    .condition-good { background: #fff3cd; color: #856404; }
+    .condition-average { background: #f8d7da; color: #721c24; }
+    .suggestion-rank {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: var(--algeria-green);
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.2rem 0.7rem 0.2rem 0.5rem;
+        border-radius: 0 0 12px 0;
+    }
+    .no-results-box {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+    .no-results-box i {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+    .budget-header {
+        background: linear-gradient(135deg, var(--algeria-green) 0%, var(--algeria-green-light) 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .budget-header::before {
+        content: '💰';
+        position: absolute;
+        font-size: 6rem;
+        opacity: 0.1;
+        right: -10px;
+        top: -10px;
+    }
+    .budget-header h3 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.4rem;
+    }
+    .budget-header .budget-range {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-top: 0.25rem;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card">
+            <div class="card-header text-center">
+                <h2><i class="fas fa-wallet me-2"></i>Laptop Suggestions</h2>
+            </div>
+            <div class="card-body p-4">
+                <!-- Budget summary -->
+                <div class="budget-header">
+                    <h3><i class="fas fa-coins me-2"></i>Your Budget</h3>
+                    <div class="budget-range">{{ min_price_formatted }} – {{ max_price_formatted }} DZD</div>
+                    {% if condition %}
+                    <div class="mt-2" style="font-size:0.9rem;opacity:0.9;">
+                        <i class="fas fa-filter me-1"></i>Condition: {{ condition }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if result.success and result.suggestions %}
+                <p class="text-muted mb-3">
+                    <i class="fas fa-check-circle text-success me-1"></i>
+                    Found <strong>{{ result.total }}</strong> laptop configuration{{ result.total|pluralize }} within your budget.
+                </p>
+
+                {% for s in result.suggestions %}
+                <div class="suggestion-card">
+                    <span class="suggestion-rank">#{{ forloop.counter }}</span>
+                    <div class="row align-items-center">
+                        <div class="col-md-8 ps-md-4">
+                            <div class="suggestion-label">{{ s.label }}</div>
+                            <div class="suggestion-specs">
+                                <span class="spec-badge"><i class="fas fa-microchip"></i>{{ s.cpu_family|upper }}{% if s.cpu_generation != '0' %} Gen{{ s.cpu_generation }}{% endif %}{% if s.cpu_suffix %} {{ s.cpu_suffix }}{% endif %}</span>
+                                {% if s.gpu_tier != 'NONE' %}
+                                <span class="spec-badge"><i class="fas fa-tv"></i>{{ s.gpu_tier }}{% if s.gpu_suffix %} {{ s.gpu_suffix }}{% endif %}</span>
+                                {% else %}
+                                <span class="spec-badge"><i class="fas fa-tv"></i>Integrated</span>
+                                {% endif %}
+                                <span class="spec-badge"><i class="fas fa-memory"></i>{{ s.ram_size_gb }} GB {{ s.ram_type_class }}</span>
+                                {% if s.ssd_size_gb > 0 %}
+                                <span class="spec-badge"><i class="fas fa-hdd"></i>{{ s.ssd_size_gb }} GB SSD</span>
+                                {% endif %}
+                                {% if s.hdd_size_gb > 0 %}
+                                <span class="spec-badge"><i class="fas fa-hdd"></i>{{ s.hdd_size_gb }} GB HDD</span>
+                                {% endif %}
+                                <span class="spec-badge"><i class="fas fa-desktop"></i>{{ s.screen_size }}" {{ s.resolution_class }}</span>
+                            </div>
+                            <div class="mt-2">
+                                {% if s.condition == 'JAMAIS UTILISÉ' %}
+                                <span class="condition-badge condition-new"><i class="fas fa-star me-1"></i>Brand New</span>
+                                {% elif s.condition == 'BON ÉTAT' %}
+                                <span class="condition-badge condition-good"><i class="fas fa-thumbs-up me-1"></i>Good Condition</span>
+                                {% elif s.condition == 'MOYEN' %}
+                                <span class="condition-badge condition-average"><i class="fas fa-recycle me-1"></i>Average</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <div class="suggestion-price">{{ s.predicted_price_formatted }}</div>
+                            <div class="suggestion-price-range">
+                                {{ s.min_price_formatted }} – {{ s.max_price_formatted }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% elif result.success and not result.suggestions %}
+                <div class="no-results-box">
+                    <i class="fas fa-search"></i>
+                    <h4 class="text-muted">No laptops found in this range</h4>
+                    <p class="text-muted">Try widening your budget range or changing the condition filter.</p>
+                    <a href="{% url 'predictor:suggest' %}" class="btn btn-predict mt-3">
+                        <i class="fas fa-redo me-2"></i>Try Again
+                    </a>
+                </div>
+                {% else %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>{{ result.error }}
+                </div>
+                {% endif %}
+
+                <!-- Action buttons -->
+                <div class="text-center mt-4 d-flex flex-wrap justify-content-center gap-2">
+                    <a href="{% url 'predictor:suggest' %}" class="btn btn-predict">
+                        <i class="fas fa-search-dollar me-2"></i>New Search
+                    </a>
+                    <a href="{% url 'predictor:home' %}" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 0.75rem 2rem;">
+                        <i class="fas fa-calculator me-2"></i>Predict Exact Specs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

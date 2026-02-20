@@ -386,6 +386,45 @@ class LaptopSpecsForm(forms.Form):
     )
 
 
+class BudgetForm(forms.Form):
+    """Form for budget-based laptop suggestions."""
+    min_price = forms.IntegerField(
+        label="Minimum Budget (DZD)",
+        min_value=0,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g., 50000',
+        })
+    )
+    max_price = forms.IntegerField(
+        label="Maximum Budget (DZD)",
+        min_value=0,
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'e.g., 150000',
+        })
+    )
+    condition = forms.ChoiceField(
+        label="Condition Preference",
+        choices=[
+            ('', 'Any Condition'),
+            ('JAMAIS UTILISÉ', 'Never Used (Brand New)'),
+            ('BON ÉTAT', 'Good Condition'),
+            ('MOYEN', 'Average Condition'),
+        ],
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        min_p = cleaned.get('min_price')
+        max_p = cleaned.get('max_price')
+        if min_p is not None and max_p is not None and min_p > max_p:
+            raise forms.ValidationError("Minimum budget cannot be greater than maximum budget.")
+        return cleaned
+
+
 class PredictionFeedbackForm(forms.Form):
     """Form for collecting user feedback on predictions"""
     

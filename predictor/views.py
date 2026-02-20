@@ -9,8 +9,8 @@ from django.utils import timezone
 from datetime import timedelta
 import json
 
-from .forms import LaptopSpecsForm, PredictionFeedbackForm
-from .model_utils import predict_price, SERIES_TIER_MAP
+from .forms import LaptopSpecsForm, PredictionFeedbackForm, BudgetForm
+from .model_utils import predict_price, SERIES_TIER_MAP, generate_suggestions
 from .models import PredictionFeedback
 
 
@@ -142,6 +142,34 @@ def predict_api(request):
         'success': False,
         'error': 'POST method required'
     })
+
+
+# ---------- Budget Suggest ----------
+
+def suggest(request):
+    """Suggest laptops within a user-defined budget range."""
+    if request.method == 'POST':
+        form = BudgetForm(request.POST)
+        if form.is_valid():
+            min_price = form.cleaned_data['min_price']
+            max_price = form.cleaned_data['max_price']
+            condition = form.cleaned_data.get('condition') or None
+
+            result = generate_suggestions(min_price, max_price, condition_filter=condition)
+
+            return render(request, 'predictor/suggest_result.html', {
+                'form': form,
+                'result': result,
+                'min_price': min_price,
+                'max_price': max_price,
+                'min_price_formatted': f"{min_price:,}",
+                'max_price_formatted': f"{max_price:,}",
+                'condition': condition,
+            })
+    else:
+        form = BudgetForm()
+
+    return render(request, 'predictor/suggest.html', {'form': form})
 
 
 # ---------- Compare Laptops ----------
