@@ -22,3 +22,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("predictor.urls")),
 ]
+
+# Custom error handlers
+handler400 = "predictor.views.error_400"
+handler403 = "predictor.views.error_403"
+handler404 = "predictor.views.error_404"
+handler500 = "predictor.views.error_500"

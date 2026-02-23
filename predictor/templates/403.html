@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 – Forbidden | Algerian Laptop Price Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --algeria-green: #006233;
+            --algeria-green-light: #00843d;
+            --algeria-red: #d21034;
+            --amber: #f59e0b;
+        }
+
+        * { font-family: 'Poppins', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: linear-gradient(135deg, #1a1200 0%, #2d1f00 40%, #1a1200 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(245,158,11,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0,98,51,0.06) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.18;
+            animation: drift 14s ease-in-out infinite;
+            z-index: 0;
+        }
+        .orb-1 { width: 380px; height: 380px; background: var(--amber); top: -100px; right: -100px; animation-duration: 16s; }
+        .orb-2 { width: 280px; height: 280px; background: #ff6600; bottom: -70px; left: -70px; animation-duration: 12s; animation-delay: -5s; }
+        .orb-3 { width: 150px; height: 150px; background: var(--amber); top: 60%; left: 8%; animation-duration: 18s; animation-delay: -9s; }
+
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(20px, -20px); }
+            66% { transform: translate(-15px, 15px); }
+        }
+
+        .error-card {
+            position: relative;
+            z-index: 1;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 28px;
+            padding: 3rem 3.5rem;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,158,11,0.08), inset 0 1px 0 rgba(255,255,255,0.07);
+            animation: slideUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .error-code {
+            font-size: clamp(7rem, 20vw, 10rem);
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--amber) 0%, #ff8c00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(245,158,11,0.4));
+            display: inline-block;
+        }
+
+        /* Lock icon with pulse ring */
+        .lock-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        .lock-icon {
+            font-size: 3.5rem;
+            display: block;
+            animation: lock-shake 4s ease-in-out infinite;
+        }
+        .lock-ring {
+            position: absolute;
+            inset: -10px;
+            border: 2px solid rgba(245,158,11,0.4);
+            border-radius: 50%;
+            animation: ring-pulse 2s ease-in-out infinite;
+        }
+        @keyframes lock-shake {
+            0%, 80%, 100% { transform: translateY(0); }
+            82% { transform: translateY(-6px); }
+            84% { transform: translateY(0); }
+            86% { transform: translateY(-4px); }
+        }
+        @keyframes ring-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 0; }
+        }
+
+        .error-stripe {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--amber), transparent);
+            border-radius: 2px;
+            margin: 1.2rem auto;
+            width: 80px;
+            animation: pulse-bar 2s ease-in-out infinite;
+            box-shadow: 0 0 12px rgba(245,158,11,0.5);
+        }
+        @keyframes pulse-bar { 0%,100%{width:80px;opacity:0.7} 50%{width:120px;opacity:1} }
+
+        .error-title { font-size: 1.6rem; font-weight: 700; color: #ffffff; margin-bottom: 0.75rem; }
+        .error-message { font-size: 1rem; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 2rem; }
+
+        .access-denied-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(245,158,11,0.15);
+            border: 1px solid rgba(245,158,11,0.35);
+            color: var(--amber);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            margin-bottom: 2rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--amber) 0%, #d97706 100%);
+            color: #1a0a00;
+            border: none;
+            padding: 0.85rem 2.2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 6px 24px rgba(245,158,11,0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-home:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(245,158,11,0.6); color: #1a0a00; }
+
+        .btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.85);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.85rem 2.2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.13); color: #fff; transform: translateY(-2px); }
+
+        .footer-note {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 0; right: 0;
+            text-align: center;
+            color: rgba(255,255,255,0.35);
+            font-size: 0.78rem;
+            z-index: 1;
+        }
+        .footer-note a { color: rgba(255,255,255,0.5); text-decoration: none; }
+        .footer-note a:hover { color: #fff; }
+
+        .particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: float-up linear infinite;
+        }
+        @keyframes float-up {
+            0% { transform: translateY(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        @media (max-width: 576px) {
+            .error-card { padding: 2rem 1.25rem; }
+            .error-title { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="error-card">
+        <div class="lock-wrapper">
+            <span class="lock-icon">🔒</span>
+            <div class="lock-ring"></div>
+        </div>
+        <div class="error-code">403</div>
+        <div class="error-stripe"></div>
+        <h1 class="error-title">Access Forbidden</h1>
+        <p class="error-message">
+            You don't have permission to view this page.<br>
+            If you think this is a mistake, please contact the administrator.
+        </p>
+        <div class="mb-4">
+            <span class="access-denied-badge">
+                <i class="fas fa-shield-alt"></i> Access Denied
+            </span>
+        </div>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a href="/" class="btn-home">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+            <a href="javascript:history.back()" class="btn-ghost">
+                <i class="fas fa-arrow-left"></i> Go Back
+            </a>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        &copy; 2026 Algerian Laptop Price Predictor &nbsp;|&nbsp;
+        <a href="/">Home</a> &nbsp;·&nbsp;
+        <a href="/suggest/">Budget Suggest</a> &nbsp;·&nbsp;
+        <a href="/compare/">Compare</a>
+    </div>
+
+    <script>
+        const container = document.getElementById('particles');
+        const colors = ['rgba(245,158,11,0.4)', 'rgba(255,140,0,0.3)', 'rgba(255,200,0,0.2)'];
+        for (let i = 0; i < 28; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = (40 + Math.random() * 70) + 'vh';
+            const size = Math.random() * 4 + 1;
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+            p.style.animationDuration = (Math.random() * 12 + 8) + 's';
+            p.style.animationDelay = (Math.random() * 10) + 's';
+            container.appendChild(p);
+        }
+    </script>
+</body>
+</html>
