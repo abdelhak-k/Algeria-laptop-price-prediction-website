@@ -305,7 +305,7 @@ def _lookup_gpu_score(gpu_tier, gpu_suffix):
 
     search_names = []
 
-    if gpu_tier.startswith('RTX') or gpu_tier.startswith('GTX'):
+    if gpu_tier.startswith('RTX') or gpu_tier.startswith('GTX') or gpu_tier.startswith('GT'):
         search_names.append(f'NVIDIA GEFORCE {gpu_tier.upper()}{suffix_str}')
         search_names.append(f'GEFORCE {gpu_tier.upper()}{suffix_str}')
         search_names.append(f'NVIDIA GEFORCE {gpu_tier.upper()}')
