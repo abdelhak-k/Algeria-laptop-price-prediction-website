@@ -190,7 +190,7 @@ CPU_SUFFIX_CHOICES = [
 GPU_TIER_CHOICES = [
     ('NONE', 'No Dedicated GPU (Integrated)'),
     # NVIDIA GeForce GTX
-    ('GTX', 'GTX (Generic)'),
+    ('GT', 'GT (Generic)'),
     ('GTX 1050', 'GTX 1050'),
     ('GTX 1060', 'GTX 1060'),
     ('GTX 1070', 'GTX 1070'),
