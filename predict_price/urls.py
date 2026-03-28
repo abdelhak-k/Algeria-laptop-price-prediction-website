@@ -17,10 +17,22 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.sitemaps.views import sitemap
+from django.views.generic import TemplateView
+from predictor.sitemaps import sitemaps
+
+sitemaps_dict = {
+    'static': sitemaps['static'],
+    'dynamic': sitemaps['dynamic'],
+}
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("predictor.urls")),
+    
+    # SEO URLs
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps_dict}, name='django.contrib.sitemaps.views.sitemap'),
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
 ]
 
 # Custom error handlers
@@ -28,3 +40,4 @@ handler400 = "predictor.views.error_400"
 handler403 = "predictor.views.error_403"
 handler404 = "predictor.views.error_404"
 handler500 = "predictor.views.error_500"
+

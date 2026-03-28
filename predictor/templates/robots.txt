@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+Allow: /static/
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /private/
+Disallow: /*?*
+Crawl-delay: 1
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: *
+Sitemap: https://laptopdz.leapcell.app/sitemap.xml

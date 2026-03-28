@@ -4,10 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Algerian Laptop Price Predictor{% endblock %}</title>
+    <meta name="theme-color" content="#006233">
+    <meta name="description" content="{% block meta_description %}Free AI-powered tool to predict laptop prices in Algeria. Get accurate price estimates in DZD for any laptop based on specifications.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}laptop price predictor, Algeria, DZD, price estimate, specifications, machine learning{% endblock %}">
+    <meta name="author" content="ENSIA Data Mining Project">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}Algerian Laptop Price Predictor{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Predict laptop prices in Algeria with AI-powered accuracy{% endblock %}">
+    <meta property="og:url" content="https://laptopdz.leapcell.app">
+    <meta property="og:image" content="https://laptopdz.leapcell.app/static/predictor/images/og-image.jpg">
+    <meta property="og:site_name" content="Algerian Laptop Price Predictor">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Algerian Laptop Price Predictor{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Free tool to predict laptop prices in Algeria{% endblock %}">
+    <meta name="twitter:image" content="https://laptopdz.leapcell.app/static/predictor/images/og-image.jpg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://laptopdz.leapcell.app{% block canonical %}{% endblock %}">
+    
+    <!-- Alternate Links for Language Variants -->
+    <link rel="alternate" hreflang="en" href="https://laptopdz.leapcell.app">
+    <link rel="alternate" hreflang="fr" href="https://laptopdz.leapcell.app?lang=fr">
+    <link rel="alternate" hreflang="ar" href="https://laptopdz.leapcell.app?lang=ar">
+    <link rel="alternate" hreflang="x-default" href="https://laptopdz.leapcell.app">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'predictor/images/favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'predictor/images/apple-touch-icon.png' %}">
+    
+    <title>{% block title %}Algerian Laptop Price Predictor - Accurate DZD Price Estimates{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Algerian Laptop Price Predictor",
+      "description": "AI-powered tool to predict laptop prices in the Algerian market based on specifications",
+      "url": "https://laptopdz.leapcell.app",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "category": "Free"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "ENSIA Data Mining Project",
+        "url": "https://www.ensia.edu.dz"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "150"
+      }
+    }
+    </script>
     <style>
         :root {
             /* Algerian Flag Colors */

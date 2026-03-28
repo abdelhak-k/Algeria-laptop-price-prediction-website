@@ -1,6 +1,17 @@
 {% extends 'predictor/base.html' %}
 {% load static %}
-{% block title %}Compare Laptops{% endblock %}
+{% block title %}Compare Laptops - Algerian Market Comparison Tool{% endblock %}
+
+{% block meta_description %}Compare laptop specifications and predicted prices in the Algerian market. Find the best value for your budget with detailed specifications analysis.{% endblock %}
+
+{% block meta_keywords %}compare laptops, laptop comparison tool, Algeria price comparison, find best laptop, DZD comparison{% endblock %}
+
+{% block og_title %}Compare Laptop Prices - Algeria{% endblock %}
+
+{% block og_description %}Compare laptop specifications and prices in the Algerian market side by side{% endblock %}
+
+{% block canonical %}/compare/{% endblock %}
+
 {% block content %}
 <style>
     .compare-form-card .compare-col { min-width: 0; }
@@ -81,7 +92,15 @@
 <script src="{% static 'predictor/js/laptop-form-dropdowns.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var prefixes = {{ prefixes_json|safe }};
+    var parseJson = function(raw, fallback) {
+        try {
+            return raw ? JSON.parse(raw) : fallback;
+        } catch {
+            return fallback;
+        }
+    };
+
+    var prefixes = parseJson('{{ prefixes_json|escapejs }}', []);
     prefixes.forEach(function(prefix) {
         initLaptopFormDropdowns(prefix);
     });

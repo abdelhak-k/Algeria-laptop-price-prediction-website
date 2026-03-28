@@ -49,5 +49,56 @@ Thumbs.db
 # Media files (if any)
 media/
 
+# Static files
+staticfiles/
+*.pyc
+__pycache__
+
+# Sensitive files
+*.key
+*.pem
+*.p12
+secrets.json
+config.local.py
+
+# Cache
+.cache/
+*.cache
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*~
+
+# Local development
+.local/
+local/
+*.pem
+
+# Docker
+.dockerignore
+docker-compose.local.yml
+
+# Logs
+logs/
+*.log
+
+# System
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
 # Static files (collected)
 staticfiles/
