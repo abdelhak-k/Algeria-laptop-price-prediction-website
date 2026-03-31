@@ -1,11 +1,13 @@
 # SEO and security middleware
-from django.middleware.base import MiddlewareBase
 
-
-class SEOHeadersMiddleware(MiddlewareBase):
+class SEOHeadersMiddleware:
     """Add SEO-friendly headers to responses."""
     
-    def process_response(self, request, response):
+    def __init__(self, get_response):
+        self.get_response = get_response
+        
+    def __call__(self, request):
+        response = self.get_response(request)
         # Add canonical URL
         response['X-Content-Type-Options'] = 'nosniff'
         
